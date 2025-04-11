@@ -1,0 +1,3 @@
+This folder is just here to store the queries I'm using/planning to use for the project.
+I may look for a way to use the queries from these files instead of pasting them into the bodies of the requests.
+But for now this can essentially be ignored unless you want to see the queries I'm using

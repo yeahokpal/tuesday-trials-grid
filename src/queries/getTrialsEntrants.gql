@@ -1,0 +1,22 @@
+query getTrialsEntrants($searchCriteria: TournamentQuery!, $videoGameID: ID) {
+    tournaments(query: $searchCriteria) {
+        pageInfo {
+            page
+            perPage
+            totalPages
+        }
+        nodes {
+            name
+            url
+            events(filter: { videogameId: [$videoGameID] }) {
+                name
+                entrants {
+                    nodes {
+                        name
+                        id
+                    }
+                }
+            }
+        }
+    }
+}
