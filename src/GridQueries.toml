@@ -1,3 +1,28 @@
+[[vars]]
+var = "game"
+query = "SELECT DISTINCT Name FROM Event"
+
+[[vars]]
+var = "placement"
+values = ["3", "8"]
+
+[[vars]]
+var = "year"
+query = "SELECT DISTINCT strftime('%Y', StartAt, 'unixepoch') FROM Tournament"
+
+[[vars]]
+var = "stream_game"
+query = "SELECT DISTINCT Game FROM Stream"
+
+[[vars]]
+var = "miscdata"
+query = "SELECT name FROM pragma_table_info('MiscData') WHERE name != 'ID'"
+
+[[vars]]
+var = "above/below"
+values = [">", "<"]
+labels = ["above", "below"]
+
 [[queries]]
 label = "[game]"
 query = "SELECT DISTINCT p.Name FROM EVENT e JOIN Standing s ON s.EventID = e.ID JOIN Player p ON p.ID = s.PlayerID WHERE e.Name = \"[game]\""
@@ -5,7 +30,7 @@ vars = ["game"]
 odds = 500
 
 [[queries]]
-label = "Placed [placement] in [game]"
+label = "Placed Top [placement] in [game]"
 query = """
 SELECT DISTINCT p.Name FROM EVENT e
 JOIN Standing s ON s.EventID = e.ID
@@ -55,6 +80,25 @@ where s.Standing = 1 and e.Name = "[game]"
 """
 vars = ["game"]
 odds = 50
+
+[[queries]]
+label = "Been on stream"
+query = """
+select distinct name
+from (select player1 as name from Stream union select player2 from Stream) s
+"""
+odds = 50
+
+[[queries]]
+label = "On stream in [stream_game]"
+query = """
+select distinct name
+from (select player1 as name, game from Stream union select player2, game from Stream) s
+where s.game = "[stream_game]"
+"""
+vars = ["stream_game"]
+odds = 50
+
 
 [[queries]]
 label = "[miscdata]"
