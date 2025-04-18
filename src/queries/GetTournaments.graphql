@@ -1,0 +1,16 @@
+query GetTournaments($page: Int) {
+    tournaments(query: {page: $page, perPage: 100, sortBy: "id asc", filter: {location: {distanceFrom: "39.99386797577957, -83.00544391215689", distance: "1mi"}}}) {
+        pageInfo {
+            totalPages
+        }
+        nodes {
+            name
+            id
+            startAt
+            events {
+                id
+                name
+            }
+        }
+    }
+}

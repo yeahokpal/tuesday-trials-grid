@@ -1,0 +1,31 @@
+query GetSets($id: ID, $events: [ID], $page: Int, $pageSize: Int) {
+    tournament(id: $id) {
+        id
+        events(filter: {ids: $events}) {
+            id
+            sets(page: $page, perPage: $pageSize) {
+                pageInfo {
+                    totalPages
+                }
+                nodes {
+                    id
+                    startedAt
+                    completedAt
+                    slots {
+                        entrant {
+                            id
+                        }
+                        standing {
+                            placement
+                            stats {
+                                score {
+                                    value
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

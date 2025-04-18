@@ -1,0 +1,103 @@
+[[queries]]
+label = "[game]"
+query = "SELECT DISTINCT p.Name FROM EVENT e JOIN Standing s ON s.EventID = e.ID JOIN Player p ON p.ID = s.PlayerID WHERE e.Name = \"[game]\""
+vars = ["game"]
+odds = 500
+
+[[queries]]
+label = "Placed [placement] in [game]"
+query = """
+SELECT DISTINCT p.Name FROM EVENT e
+JOIN Standing s ON s.EventID = e.ID
+JOIN Player p ON p.ID = s.PlayerID
+WHERE e.Name = "[game]" AND s.Standing <= [placement]
+"""
+vars = ["game", "placement"]
+odds = 100
+
+[[queries]]
+label = "Placed Top [placement] in 2 games in the same event (min: [entrantCount] entrants)"
+query = """
+SELECT DISTINCT p.Name
+FROM EVENT e
+JOIN (SELECT EventID, COUNT(*) AS Count FROM Standing GROUP BY EventId) entrants ON entrants.EventID = e.ID
+JOIN Standing s ON s.EventID = e.ID
+JOIN Player p ON p.ID = s.PlayerID
+WHERE s.Standing <= [placement] AND entrants.Count >= [entrantCount]
+GROUP BY e.TournamentID, p.Name
+HAVING COUNT(*) > 1
+"""
+vars = ["placement", "entrantCount"]
+options = [["1", "8"], ["3", "8"], ["3", "16"], ["8", "24"]]
+odds = 25
+
+[[queries]]
+label = "Has entered a Trials event in [year]"
+query = """
+select distinct p.Name
+from Tournament t
+join Event e on e.TournamentID = t.id
+join Standing s on s.EventID = e.ID
+join player p on p.id = s.PlayerID
+where strftime('%Y', StartAt, 'unixepoch') = [year]
+"""
+vars = ["year"]
+odds = 50
+
+[[queries]]
+label = "[game] winner"
+query = """
+select distinct p.Name
+from Standing s
+join Event e on e.ID = s.EventID
+join Player p on p.id = s.PlayerID
+where s.Standing = 1 and e.Name = "[game]"
+"""
+vars = ["game"]
+odds = 50
+
+[[queries]]
+label = "[miscdata]"
+query = """
+select distinct p.Name
+from Player p
+join MiscData m ON m.id = p.id AND m."[miscdata]" = 'Y'
+"""
+odds = 100
+vars = ["miscdata"]
+
+[[queries]]
+label = "Average set length [above/below] 10 minutes"
+query = """
+select Name
+from Player
+JOIN SetResult r ON r.winnerID = Player.ID OR r.loserID = player.ID
+WHERE r.loserScore > -1 AND r.duration BETWEEN 120 AND 1200
+GROUP BY Name
+HAVING AVG(r.duration) [above/below] 600
+"""
+odds = 25
+vars = ["above/below"]
+
+[[queries]]
+label = "Lifetime set win % [above/below] 50% (min 10 games played)"
+query = """
+select Name
+from Player
+join (select winnerID, count(*) as count from SetResult where loserScore > -1 group by winnerID) w on w.winnerID = Player.ID
+join (select loserID, count(*) as count from SetResult where loserScore > -1 group by loserID) l on l.loserID = Player.ID
+group by Name
+having SUM(w.count) > 10 AND SUM(w.count) * 1.0 / (SUM(w.count) + SUM(l.count)) [above/below] 0.5
+"""
+odds = 25
+vars = ["above/below"]
+
+[[queries]]
+label = "November 6th birthday"
+query = """SELECT Name FROM Player WHERE Name IN ("SlabofBeef", "Zeal", "ThereGoesMySanity")"""
+odds = 5
+
+[[queries]]
+label = "Named Nathan"
+query = """SELECT Name FROM Player WHERE Name IN ("SlabofBeef", "MeatyShield", "Ichi")"""
+odds = 5

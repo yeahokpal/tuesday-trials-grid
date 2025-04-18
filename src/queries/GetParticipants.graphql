@@ -1,0 +1,27 @@
+query GetParticipants($id: ID, $page: Int, $pageSize: Int) {
+    tournament(id: $id) {
+        id
+        participants(query: {page: $page, perPage: $pageSize, sortBy: "id asc"}) {
+            pageInfo {
+                totalPages
+            }
+            nodes {
+                id
+                player {
+                    id
+                    gamerTag
+                }
+                entrants {
+                    id
+                    standing {
+                        isFinal
+                        placement
+                    }
+                    event {
+                        id
+                    }
+                }
+            }
+        }
+    }
+}
