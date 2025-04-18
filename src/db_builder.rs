@@ -48,10 +48,10 @@ pub async fn build_db() -> Result<(), Box<dyn Error>> {
             .filter_map(|x| x)
             .filter(|t| t.name.as_ref().unwrap().contains("Trial")) {
         let id = tournament.id.as_ref().unwrap();
-        // sql.execute("INSERT INTO Tournament VALUES (?1, ?2, ?3)", (id, tournament.name.as_ref().unwrap(), tournament.start_at.as_ref().unwrap()))?;
+        sql.execute("INSERT INTO Tournament VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING", (id, tournament.name.as_ref().unwrap(), tournament.start_at.as_ref().unwrap()))?;
         for event in tournament.events.iter().flatten().filter_map(|x| x.as_ref()) {
-            // sql.execute("INSERT INTO Event VALUES (?1, ?2, ?3)", (event.id.as_ref().unwrap(), event.name.as_ref().unwrap(), id))
-            // .expect("Event insert");
+            sql.execute("INSERT INTO Event VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING", (event.id.as_ref().unwrap(), event.name.as_ref().unwrap(), id))
+            .expect("Event insert");
         }
         sleep(Duration::from_millis(300)).await;
         let participants = get_paged_query(
@@ -63,24 +63,21 @@ pub async fn build_db() -> Result<(), Box<dyn Error>> {
         for participant in participants.into_iter().filter_map(|x| x) {
             let pid = participant.player.as_ref().and_then(|p| p.id.clone()).expect("Missing id");
             if !players.contains(&pid) {
-                // sql.execute("INSERT INTO Player VALUES (?1, ?2) ON CONFLICT DO NOTHING", (&pid, participant.player.as_ref().and_then(|p|p.gamer_tag.as_ref()).expect("Missing id")))
-                // .expect("Player insert");
+                sql.execute("INSERT INTO Player VALUES (?1, ?2) ON CONFLICT DO NOTHING", (&pid, participant.player.as_ref().and_then(|p|p.gamer_tag.as_ref()).expect("Missing id")))
+                .expect("Player insert");
                 players.insert(pid.clone());
             }
             for entrant in participant.entrants.into_iter().flatten().filter_map(|x| x) {
                 entrants.insert(entrant.id.as_ref().expect("").clone(), pid.clone());
-                // if entrant.standing.as_ref().and_then(|f|f.is_final).unwrap_or(false) {
-                //     sql.execute("INSERT INTO Standing VALUES (?1, ?2, ?3)", 
-                //         (&pid, 
-                //             entrant.event.expect("").id.expect(""), 
-                //             entrant.standing.unwrap().placement.unwrap()
-                //         )).expect("Standing insert");
-                // }
-                sql.execute("UPDATE SetResult SET winnerID = ?1 WHERE winnerID = ?2", (&pid, entrant.id.as_ref()))?;
-                sql.execute("UPDATE SetResult SET loserID = ?1 WHERE loserID = ?2", (&pid, entrant.id.as_ref()))?;
+                if entrant.standing.as_ref().and_then(|f|f.is_final).unwrap_or(false) {
+                    sql.execute("INSERT INTO Standing VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING", 
+                        (&pid, 
+                            entrant.event.expect("").id.expect(""), 
+                            entrant.standing.unwrap().placement.unwrap()
+                        )).expect("Standing insert");
+                }
             }
         }
-        continue;
         let arr : Vec<Option<String>> = tournament.events.as_ref().expect("").iter().map(|e| e.as_ref()?.id.clone()).collect();
 
         for next_ten in arr.chunks(1) {
@@ -103,7 +100,7 @@ pub async fn build_db() -> Result<(), Box<dyn Error>> {
                     if let (Some(winner_id), Some(loser_id)) = (winner.entrant.as_ref().and_then(|e| e.id.as_ref()), loser.entrant.as_ref().and_then(|e| e.id.as_ref())) {
                     if let (Some(winner_player_id), Some(loser_player_id)) = (entrants.get(winner_id), entrants.get(loser_id)) {
                     if let (Some(winner_score), Some(loser_score)) = (winner.standing.as_ref().and_then(|st|st.stats.as_ref()).and_then(|s|s.score.as_ref()).and_then(|sc|sc.value), loser.standing.as_ref().and_then(|st|st.stats.as_ref()).and_then(|s|s.score.as_ref()).and_then(|sc|sc.value)) {
-                        if loser_score >= 0.0 { sql.execute("INSERT INTO SetResult VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)", (&set.id, &event.id, winner_player_id, loser_player_id, winner_score, loser_score, started_at.and_then(|s| Some(completed_at - s))))?; }
+                        if loser_score >= 0.0 { sql.execute("INSERT INTO SetResult VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7) ON CONFLICT DO NOTHING", (&set.id, &event.id, winner_player_id, loser_player_id, winner_score, loser_score, started_at.and_then(|s| Some(completed_at - s))))?; }
                     }}}}}}}}
                 }
             }
