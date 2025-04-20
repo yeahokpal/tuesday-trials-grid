@@ -1,0 +1,26 @@
+.searchModal {
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #00000024;
+}
+
+.search {
+    margin-top: 10vh;
+    padding: 10px;
+    background-color: gray;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    border-color: darkgray;
+    border-radius: 10px;
+    border-width: 10px;
+}
+
+.searchBar {
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+}

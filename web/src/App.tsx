@@ -1,33 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useState } from 'react'
 import './App.css'
+import initSqlJs, { Database } from "sql.js";
+
+import dbFile from "../../db.sqlite?url";
+import sqlWasm from "../node_modules/sql.js/dist/sql-wasm.wasm?url";
+import Grid from './Grid/Grid';
+import EditGrid from './EditGrid/EditGrid';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const searchParams = new URLSearchParams(window.location.search);
+  const customData = searchParams.get("customData");
+  const [db, setDb] = useState<Database | null>(null);
+  const [edit, setEdit] = useState(false);
+
+  useEffect(() => {
+    initSqlJs({locateFile: () => sqlWasm })
+      .then(SQL => fetch(dbFile)
+        .then(db => db.bytes())
+        .then(bytes => setDb(new SQL.Database(bytes))));
+  }, []);
+
+  function setCustomData(customData: string | null) {
+    if (searchParams.get("customData") != customData)
+    {
+      searchParams.set("customData", customData ?? "");
+      window.location.search = searchParams.toString();
+    }
+  }
+
+  function loadData() {
+    setCustomData(prompt("Enter grid data:"));
+  }
+  function editMode() {
+    setEdit(!edit);
+  }
+
+  if (db === null) return <>Loading...</>
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div style={{position: "absolute", right: "0%"}}>
+        <button onClick={loadData}>Load Custom Grid</button>
+        <br/>
+        <button hidden onClick={editMode}>Toggle Edit Mode</button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <h1>Tuesday Trials Grid</h1>
+      {edit ? <EditGrid db={db} customData={customData} setCustomData={setCustomData}/> : <Grid key={customData} db={db} customData={customData}/>}
     </>
   )
 }

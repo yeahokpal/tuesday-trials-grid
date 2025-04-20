@@ -1,0 +1,30 @@
+.grid {
+    display: grid;
+    grid: auto / 20% 20% 20% 20% 20%;
+    align-items: center;
+}
+.gridSquare {
+    background-color: #5a4f74;
+    border-radius: 12px;
+    margin: 5px;
+    aspect-ratio: 1;
+}
+.gridSquare.selected {
+    background-color: #574386;
+}
+.complete .gridSquare {
+    background-color: #313131;
+}
+.gridSquare.guessed {
+    background-color: #366136;
+}
+.gridLabel {
+    text-align: center;
+    font-size: min( 2em, 2.75vw);
+}
+@media (max-width: 1200px) {
+    .grid {
+        display: grid;
+        grid: auto / 25% 25% 25% 25%;
+    }
+}
