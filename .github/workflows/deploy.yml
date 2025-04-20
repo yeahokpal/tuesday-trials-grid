@@ -1,8 +1,5 @@
 name: Deploy
 
-defaults:
-  run:
-
 on:
   push:
     branches:
