@@ -47,6 +47,7 @@ class TrialsGrid {
         } else {
             this.valid = false;
         }
+        console.log(this);
     }
 
     public setRow(i: number, data: QueryData) {
@@ -108,7 +109,6 @@ class TrialsGrid {
             grid = new TrialsGrid(sql, Array.from(TrialsGrid.getRandomGrids(rand, ROWS + COLUMNS)), true);
         } while (!grid.valid && ++badqueries);
         console.log("Generated %d grids", badqueries);
-        console.log(grid);
 
         return grid;
     }

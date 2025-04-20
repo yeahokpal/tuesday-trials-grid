@@ -158,5 +158,5 @@ odds = 5
 
 [[queries]]
 label = "Named Nathan"
-query = """SELECT Name FROM Player WHERE Name IN ("SlabofBeef", "MeatyShield", "Ichi")"""
+query = """SELECT Name FROM Player WHERE Name IN ("SlabofBeef", "MeatyShield", "Ichi", "Sykom", "Hanu", "Ryft")"""
 odds = 5
