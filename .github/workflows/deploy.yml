@@ -1,5 +1,9 @@
 name: Deploy
 
+defaults:
+  run:
+    working-directory: web
+
 on:
   push:
     branches:
@@ -13,9 +17,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
-      - name: cd
-        run: cd web
 
       - name: Setup Node
         uses: actions/setup-node@v4
