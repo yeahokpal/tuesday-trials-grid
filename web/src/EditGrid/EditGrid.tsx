@@ -4,10 +4,8 @@ import TrialsGrid from "../TrialsGrid";
 import { useEffect, useState } from "react";
 import { COLUMNS, ROWS } from "../constants";
 
-import queryFile from '../GridQueries.toml'
 import EditLabel from "./EditLabel";
 import EditSquare from "./EditSquare";
-import { getQueryVars } from "../queryfuncs";
 
 function EditGrid({db, customData, setCustomData}: {db: Database, customData: string | null, setCustomData: (customData: string | null) => void}) {
   const [data, setData] = useState<(QueryData | undefined)[]>(customData? JSON.parse(customData) : [...new Array(ROWS + COLUMNS)].map(() => undefined));
