@@ -18,6 +18,13 @@
 .gridSquare.guessed {
     background-color: #366136;
 }
+.stat {
+    background-color: #31313140;
+    border-radius: 12px;
+    margin: 5px;
+    padding: 5px;
+    aspect-ratio: unset;
+}
 .gridLabel {
     text-align: center;
     font-size: min( 2em, 2.75vw);

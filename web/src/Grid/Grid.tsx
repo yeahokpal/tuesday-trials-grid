@@ -24,7 +24,8 @@ function Grid({db, customData}: {db: Database, customData: string | null}) {
   const [players] = useState(() => db.exec("SELECT DISTINCT Name FROM Player ORDER BY Name")[0].values.flat().map(r => r!.toString()));
   const [selected, setSelected] = useState<number|null>(null);
   const [gameData, setGameData] = useLocalStorage<{[date: string]: GameData | undefined}>("gameData", {});
-  const [statistics, setStatistics] = useState<{total: number, guesses: (number | null)[]} | undefined>(undefined);
+  const [name, setName] = useLocalStorage<string|null>("name", null);
+  const [statistics, setStatistics] = useState<ApiResponse | undefined>(undefined);
   const [customGameData, setCustomGameData] = useState<GameData | undefined>(undefined);
 
   const todayGameData: GameData = gameData[today] ?? new GameData(today);
@@ -87,12 +88,16 @@ ${[0, 1, 2].map(i => guesses.slice(i * 3, i * 3 + 3))
   .join("\n")
 }`)
   }
-  
+
   return <>
     <div className={classNames("grid", {"complete": complete})}>
       {grid.columns.map((c, i) => <div key={i} style={{gridColumn: i + 2}}><Label text={c!.label}/></div>)}
       {grid.rows.map((r, i) => <div key={i} style={{gridRow: i + 2, height: 0}}><div style={{alignContent: "center", transform: "translateY(-50%)"}}><Label text={r!.label}/></div></div>)}
-      {grid.answers.map((_, i) => <div key={i} style={{gridRow: i / 3 + 2, gridColumn: i % 3 + 2}}><Square chosen={guesses[i]} select={() => !complete && setSelected(i)} selected={selected === i}/></div>)}
+      {grid.answers.map((_, i) =>
+      <div key={i} style={{gridRow: i / 3 + 2, gridColumn: i % 3 + 2, position: "relative"}}>
+        <div className="stat" style={{position: "absolute", right: "0"}}>{statistics?.guesses[i]? (statistics.guessesCorrect[i]! * 100 / statistics.guesses[i]).toPrecision(3) + "%" : undefined}</div>
+        <Square chosen={guesses[i]} select={() => !complete && setSelected(i)} selected={selected === i}/>
+      </div>)}
       <div style={{gridRow: 2, gridColumn: 5, alignContent: "center"}}>
       <h1>{hearts}</h1>
       </div>
