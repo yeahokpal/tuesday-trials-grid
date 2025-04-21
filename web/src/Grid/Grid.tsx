@@ -97,9 +97,9 @@ ${[0, 1, 2].map(i => guesses.slice(i * 3, i * 3 + 3))
       <div key={i} style={{gridRow: i / 3 + 2, gridColumn: i % 3 + 2, position: "relative"}}>
         <div className="stat" style={{position: "absolute", right: "0"}}>
           {statistics?.guesses[i] && 
-            statistics.guessesCorrect[i] === 1 ? 
+            (statistics.guessesCorrect[i] === 1 ? 
               "Unique!" :
-              (statistics!.guessesCorrect[i]! * 100 / statistics!.guesses[i]!).toPrecision(3) + "%"
+              (statistics!.guessesCorrect[i]! * 100 / statistics!.guesses[i]!).toPrecision(3) + "%")
           }
         </div>
         <Square chosen={guesses[i]} select={() => !complete && setSelected(i)} selected={selected === i}/>
