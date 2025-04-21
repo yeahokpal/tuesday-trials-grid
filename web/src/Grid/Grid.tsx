@@ -24,7 +24,7 @@ function Grid({db, customData}: {db: Database, customData: string | null}) {
   const [players] = useState(() => db.exec("SELECT DISTINCT Name FROM Player ORDER BY Name")[0].values.flat().map(r => r!.toString()));
   const [selected, setSelected] = useState<number|null>(null);
   const [gameData, setGameData] = useLocalStorage<{[date: string]: GameData | undefined}>("gameData", {});
-  const [name, setName] = useLocalStorage<string|null>("name", null);
+  // const [name, setName] = useLocalStorage<string|null>("name", null);
   const [statistics, setStatistics] = useState<ApiResponse | undefined>(undefined);
   const [customGameData, setCustomGameData] = useState<GameData | undefined>(undefined);
 
