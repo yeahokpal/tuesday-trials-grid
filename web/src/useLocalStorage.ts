@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 
 export default function useLocalStorage<T>(key: string, defaultValue: T): [T, (value: T) => void] {
-    const [value, setValue] = useState(defaultValue);
+    const [value, setValue] = useState(() => {
+        const item = localStorage.getItem(key);
+        return item? JSON.parse(item) : defaultValue;
+    });
     
     useEffect(() => {
         const item = localStorage.getItem(key);
-        
         if (!item) {
             localStorage.setItem(key, JSON.stringify(defaultValue))
         }
-
-        setValue(item ? JSON.parse(item) : defaultValue)
 
         function handler(e: StorageEvent) {
             if (e.key !== key) return;

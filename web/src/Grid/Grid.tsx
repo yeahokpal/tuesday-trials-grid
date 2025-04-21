@@ -24,6 +24,7 @@ function Grid({db, customData}: {db: Database, customData: string | null}) {
   const [players] = useState(() => db.exec("SELECT DISTINCT Name FROM Player ORDER BY Name")[0].values.flat().map(r => r!.toString()));
   const [selected, setSelected] = useState<number|null>(null);
   const [gameData, setGameData] = useLocalStorage<{[date: string]: GameData | undefined}>("gameData", {});
+  const [statistics, setStatistics] = useState<{total: number, guesses: (number | null)[]} | undefined>(undefined);
   const [customGameData, setCustomGameData] = useState<GameData | undefined>(undefined);
 
   const todayGameData: GameData = gameData[today] ?? new GameData(today);
@@ -32,6 +33,28 @@ function Grid({db, customData}: {db: Database, customData: string | null}) {
   useEffect(() => {setCustomGameData(customData? new GameData() : undefined)}, [customData]);
 
   const complete = guesses.every(c => c != null) || lives <= 0;
+  const [alreadyComplete] = useState(complete);
+  useEffect(() => {
+    if (!customData && !statistics) {
+      if (alreadyComplete) {
+        fetch("https://trials-grid-716349156143.us-central1.run.app?" + new URLSearchParams({
+          data: JSON.stringify({today, guesses})
+        }), {
+          method: "GET",
+          mode: "cors"
+        }).then(res => res.json()).then(json => setStatistics(json));
+      } else if (complete) {
+        fetch("https://trials-grid-716349156143.us-central1.run.app", {
+          method: "POST",
+          body: JSON.stringify({today, guesses}),
+          headers: {"Content-Type": "application/json"},
+          mode: "cors"
+        }).then(res => res.json())
+          .then(json => setStatistics(json));
+      }
+    }
+  }, [complete]);
+
   const [grid] = useState(() => getCustomGrid(db, customData) ?? TrialsGrid.getRandomValidGrid(db, today));
 
   let choose = (guess: string): boolean | undefined => {
@@ -47,7 +70,9 @@ function Grid({db, customData}: {db: Database, customData: string | null}) {
       setSelected(null);
       return true;
     } else {
-      if (!customGameData) setGameData({...gameData, [today]: {...todayGameData, lives: lives - 1}});
+      if (!customGameData) {
+        setGameData({...gameData, [today]: {...todayGameData, lives: lives - 1}});
+      }
       else setCustomGameData({...customGameData, lives: lives - 1});
       return false;
     }

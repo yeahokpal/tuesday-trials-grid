@@ -41,11 +41,11 @@ class TrialsGrid {
         this.rows = loaded.slice(0, ROWS);
         this.columns = loaded.slice(ROWS, ROWS + COLUMNS);
         this.answers = [...Array(ROWS * COLUMNS)].fill(undefined);
-        if (loaded.every(l => l) || !shortCircuit) {
+        if (loaded.some(l => !l) && shortCircuit) {
+            this.valid = false;
+        } else {
             this.calcAnswers(shortCircuit);
             this.valid = this.verifyGrid();
-        } else {
-            this.valid = false;
         }
         console.log(this);
     }

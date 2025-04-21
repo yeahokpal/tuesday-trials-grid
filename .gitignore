@@ -1,3 +1,4 @@
 /target
 /output
 .env
+.vscode/settings.json
