@@ -1,4 +1,4 @@
-import { COLUMNS, MAX_LIVES, ROWS } from "../constants"
+import { COLUMNS, MAX_LIVES, ROWS } from "./constants"
 
 class GameData {
     date?: string
