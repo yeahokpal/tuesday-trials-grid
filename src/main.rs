@@ -1,13 +1,29 @@
+use std::error::Error;
+
+use db_builder::{build_db, update_players};
 use grid_builder::build_grid;
+use reqwest::Client;
+use rusqlite::Connection;
 
 mod db_builder;
 mod grid_builder;
+mod queries;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> rusqlite::Result<()> {
+    let client = Client::new();
+    let sql = Connection::open("./db.sqlite").expect("failed to open db");
+    let mut stmt = sql.prepare("select * from (select *, row_number() over (partition by p.name order by (select count(*) from standing where playerid = p.id) desc) rnk FROM Player p) where rnk = 1 and ProfileUrl is null")?;
+    let res = stmt.query_map([], |res| res.get("ID").and_then(|i|Ok(i32::to_string(&i))))?;
+
+    let vec = res.map(|i| i.unwrap()).collect::<Vec<_>>();
+    dbg!(&vec);
+
+    let _ = update_players(&client, &sql, &mut vec.iter()).await;
     // match build_db().await {
     //     Err(e)=>{dbg!(&e);},
     //     Ok(_) => {print!("success\n");}
     // };
-    dbg!(build_grid());
+    // dbg!(build_grid());
+    Ok(())
 }

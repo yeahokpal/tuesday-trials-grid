@@ -1,4 +1,4 @@
-query GetSets($id: ID, $events: [ID], $page: Int, $pageSize: Int) {
+query GetSets($id: ID!, $events: [ID!]!, $page: Int!, $pageSize: Int!) {
     tournament(id: $id) {
         id
         events(filter: {ids: $events}) {

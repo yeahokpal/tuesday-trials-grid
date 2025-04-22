@@ -26,6 +26,9 @@
     margin: 5px;
     padding: 5px;
     aspect-ratio: unset;
+    position: absolute;
+    right: 0;
+    font-size: min( 1rem, 2.75vw );
 }
 .gridLabel {
     text-align: center;

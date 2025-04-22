@@ -1,4 +1,4 @@
-query getTrialsEntrants($searchCriteria: TournamentQuery!, $videoGameID: ID) {
+query getTrialsEntrants($searchCriteria: TournamentQuery!, $videoGameID: ID!) {
     tournaments(query: $searchCriteria) {
         pageInfo {
             page

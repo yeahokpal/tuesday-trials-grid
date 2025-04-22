@@ -40,7 +40,7 @@ function Grid({db, customData}: {db: Database, customData: string | null}) {
 
   useEffect(() => {setCustomGameData(customData? new GameData() : undefined)}, [customData]);
   useEffect(() => setResultsVisible(statistics !== undefined), [statistics]);
-  useEffect(() => {selected && complete && setSelected(null)});
+  useEffect(() => {selected && complete && setSelected(null)}, [selected && complete]);
   useEffect(() => {
     if (!customData && !statistics) {
       if (alreadyComplete) {
@@ -110,13 +110,13 @@ ${[0, 1, 2].map(i => guesses.slice(i * 3, i * 3 + 3))
       {grid.rows.map((r, i) => <div key={i} style={{gridRow: i + 2, height: 0}}><div style={{alignContent: "center", transform: "translateY(-50%)"}}><Label text={r!.label}/></div></div>)}
       {grid.answers.map((_, i) =>
       <div key={i} style={{gridRow: i / 3 + 2, gridColumn: i % 3 + 2, position: "relative"}}>
-        <div className="stat" style={{position: "absolute", right: "0"}}>
-          {statistics?.guesses[i] && 
-            (statistics.guesses[i] === 1 ? 
-              "Unique!" :
-              (statistics.guesses[i] * 100 / statistics.totalGuesses[i]).toPrecision(3) + "%")
-          }
+        {statistics?.guesses[i] && 
+        <div className="stat">
+          {(statistics.guesses[i] === 1 ? 
+            "Unique!" :
+            (statistics.guesses[i] * 100 / statistics.totalGuesses[i]).toPrecision(3) + "%")}
         </div>
+        }
         <Square chosen={guesses[i]} select={() => !complete && setSelected(i)} selected={selected === i}/>
       </div>)}
       <div style={{gridRow: 2, gridColumn: 5, alignContent: "center"}}>

@@ -1,0 +1,11 @@
+query GetTournament($slug: String!) {
+    tournament(slug: $slug) {
+        name
+        id
+        startAt
+        events {
+            id
+            name
+        }
+    }
+}
