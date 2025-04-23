@@ -2,7 +2,7 @@ use std::{collections::{HashMap, HashSet}, error::Error, fmt::Debug, time::Durat
 
 use futures::future::try_join_all;
 use graphql_client::{GraphQLQuery, Response};
-use crate::queries::{get_participants, get_player::{self, GetPlayerPlayer}, get_sets, get_tournaments, GetParticipants, GetPlayer, GetSets, GetTournaments, Tournament};
+use crate::queries::{get_participants, get_player::{self, GetPlayerPlayer}, get_sets, get_tournament, get_tournaments, GetParticipants, GetPlayer, GetSets, GetTournament, GetTournaments, Tournament};
 use reqwest::Client;
 use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
@@ -41,17 +41,28 @@ pub async fn build_db() -> Result<(), Box<dyn Error>> {
     .filter_map(|x| x)
     .filter(|t| t.name.as_ref().unwrap().contains("Trial"))
     {
-        get_tournament(&mut state, Tournament::try_from(tournament)?, false).await?;
+        update_tournament(&mut state, Tournament::try_from(tournament)?, false).await?;
     }
     update_players(&state.client, &state.sql, &mut state.players.iter()).await?;
 
     Ok(())
 }
+pub async fn build_last_trials() -> Result<(), Box<dyn Error>> {
+    let mut state = DbBuilderState {
+        client: Client::new(),
+        sql: Connection::open("./db.sqlite")?,
+        players: HashSet::new()
+    };
+    let tournament = Tournament::try_from(make_request::<_, get_tournament::ResponseData>(&state.client, &GetTournament::build_query(get_tournament::Variables {slug: "trials".to_string()})).await?.data.expect("no data").tournament.expect("no data"))?;
+
+    update_tournament(&mut state, tournament, true).await
+}
+
 
 pub async fn update_players<'a>(client: &Client, sql: &Connection, players: &mut impl Iterator<Item=&'a String>) -> Result<(), Box<dyn Error>> {
     for id in players {
         dbg!(id);
-        sleep(Duration::from_millis(100)).await;
+        sleep(Duration::from_millis(1000)).await;
         let res = make_request::<_, get_player::ResponseData>(client, &GetPlayer::build_query(get_player::Variables{id: id.clone()})).await?;
         if let Some(url) = res.data.and_then(|d|d.player)
             .and_then(|p|p.user)
@@ -66,7 +77,7 @@ pub async fn update_players<'a>(client: &Client, sql: &Connection, players: &mut
     Ok(())
 }
 
-async fn get_tournament(state: &mut DbBuilderState, tournament: Tournament, force_update: bool) -> Result<(), Box<dyn Error>>{
+async fn update_tournament(state: &mut DbBuilderState, tournament: Tournament, force_update: bool) -> Result<(), Box<dyn Error>>{
     let id = &tournament.id;
     let sql = &state.sql;
     let client = &state.client;
@@ -76,6 +87,7 @@ async fn get_tournament(state: &mut DbBuilderState, tournament: Tournament, forc
     if rows == 0 && !force_update {
         return Ok(());
     }
+    dbg!("test1");
     for event in tournament.events.iter().flatten() {
         sql.execute("INSERT INTO Event VALUES (?1, ?2, ?3) ON CONFLICT DO UPDATE SET name=excluded.name, tournamentId=excluded.tournamentId", (&event.id, &event.name, id))
         .expect("Event insert");
@@ -90,7 +102,7 @@ async fn get_tournament(state: &mut DbBuilderState, tournament: Tournament, forc
     for participant in participants.into_iter().filter_map(|x| x) {
         let pid = participant.player.as_ref().and_then(|p| p.id.clone()).expect("Missing id");
         if !state.players.contains(&pid) {
-            sql.execute("INSERT INTO Player VALUES (?1, ?2) ON CONFLICT DO NOTHING", (&pid, participant.player.as_ref().and_then(|p|p.gamer_tag.as_ref()).expect("Missing id")))
+            sql.execute("INSERT INTO Player(ID, Name) VALUES (?1, ?2) ON CONFLICT DO NOTHING", (&pid, participant.player.as_ref().and_then(|p|p.gamer_tag.as_ref()).expect("Missing id")))
             .expect("Player insert");
             state.players.insert(pid.clone());
         }

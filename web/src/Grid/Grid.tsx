@@ -12,6 +12,7 @@ import classNames from "classnames";
 import { MAX_LIVES } from "../constants";
 import Results from "../Results/Results";
 import { calcLocalStats } from "../calcLocalStats";
+import { useMediaQuery } from "@mui/material";
 
 function getCustomGrid(db: Database, customData: string | null) {
   let newData: QueryData[] = JSON.parse(customData ?? "null");
@@ -104,25 +105,28 @@ ${[0, 1, 2].map(i => guesses.slice(i * 3, i * 3 + 3))
 }`)
   }
 
+  const mobile = useMediaQuery('(max-width: 1200px)');
+
+
   return <>
     <div className={classNames("grid", {"complete": complete})}>
       {grid.columns.map((c, i) => <div key={i} style={{gridColumn: i + 2}}><Label text={c!.label}/></div>)}
       {grid.rows.map((r, i) => <div key={i} style={{gridRow: i + 2, height: 0}}><div style={{alignContent: "center", transform: "translateY(-50%)"}}><Label text={r!.label}/></div></div>)}
       {grid.answers.map((_, i) =>
       <div key={i} style={{gridRow: i / 3 + 2, gridColumn: i % 3 + 2, position: "relative"}}>
-        {statistics?.guesses[i] && 
+        {statistics?.guesses[i] != null && 
         <div className="stat">
           {(statistics.guesses[i] === 1 ? 
             "Unique!" :
             (statistics.guesses[i] * 100 / statistics.totalGuesses[i]).toPrecision(3) + "%")}
         </div>
         }
-        <Square chosen={guesses[i]} select={() => !complete && setSelected(i)} selected={selected === i}/>
+        <Square chosen={guesses[i]} select={() => !complete && setSelected(i)} selected={selected === i} db={db}/>
       </div>)}
-      <div style={{gridRow: 2, gridColumn: 5, alignContent: "center"}}>
-      <h1>{hearts}</h1>
+      <div style={{gridRow: (mobile? 5 : 2), gridColumn: (mobile? 1 : 5), alignContent: "center", gridColumnEnd: (mobile? 5 : undefined)}}>
+        <h1>{hearts}</h1>
       </div>
-      {complete && <div style={{gridRow: 4, gridColumn: 5, alignContent: "center"}}>
+      {complete && <div style={{gridRow: (mobile? 6 : 4), gridColumn: (mobile? 1 : 5), alignContent: "center", gridColumnEnd: (mobile? 5 : undefined)}}>
         <button onClick={copyResults}>Copy Results</button>
         <button onClick={() => setResultsVisible(true)}>View Stats</button>
       </div>}
