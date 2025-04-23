@@ -13,6 +13,7 @@ import { MAX_LIVES } from "../constants";
 import Results from "../Results/Results";
 import { calcLocalStats } from "../calcLocalStats";
 import { useMediaQuery } from "@mui/material";
+import pastQueryData from "../pastQueryData";
 
 function getCustomGrid(db: Database, customData: string | null) {
   let newData: QueryData[] = JSON.parse(customData ?? "null");
@@ -72,7 +73,7 @@ function Grid({db, customData}: {db: Database, customData: string | null}) {
     }
   }, [name]);
 
-  const [grid] = useState(() => getCustomGrid(db, customData) ?? TrialsGrid.getRandomValidGrid(db, today));
+  const [grid] = useState(() => getCustomGrid(db, customData) ?? (pastQueryData[today]? new TrialsGrid(db, pastQueryData[today], false) : TrialsGrid.getRandomValidGrid(db, today)));
 
   let choose = (guess: string): boolean | undefined => {
     if (selected === null) return;

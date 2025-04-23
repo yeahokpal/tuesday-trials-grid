@@ -26,7 +26,7 @@ interface QueryData {
     v: {[k: string]: string};
 }
 
-declare module "*.toml" {
+declare module "*/GridQueries.toml" {
     const value: QueryFile;
     export default value;
 }

@@ -4,7 +4,6 @@ import { Database } from "sql.js";
 import queryFile from "./GridQueries.toml";
 import { COLUMNS, ROWS } from "./constants";
 
-import 'core-js/actual';
 import { toQuery, queryDataEquals, getQueryVars } from "./queryfuncs";
 
 const cyrb53 = (str: string, seed : number = 0) => {
