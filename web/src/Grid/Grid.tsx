@@ -73,7 +73,11 @@ function Grid({db, customData}: {db: Database, customData: string | null}) {
     }
   }, [name]);
 
-  const [grid] = useState(() => getCustomGrid(db, customData) ?? (pastQueryData[today]? new TrialsGrid(db, pastQueryData[today], false) : TrialsGrid.getRandomValidGrid(db, today)));
+  const [grid] = useState(() => {
+    let g = getCustomGrid(db, customData) ?? (pastQueryData[today]? new TrialsGrid(db, pastQueryData[today], false) : TrialsGrid.getRandomValidGrid(db, today))
+    console.log(g);
+    return g;
+  });
 
   let choose = (guess: string): boolean | undefined => {
     if (selected === null) return;

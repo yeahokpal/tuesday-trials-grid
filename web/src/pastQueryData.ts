@@ -1,3 +1,162 @@
 const pastQueryData: {[date: string]: QueryData[]} =
-{"4/20/2025":[{"i":6,"v":{}},{"i":0,"v":{"game":"Strive New Character Bracket"}},{"i":8,"v":{"miscdata":"Has Had A Trials Named After Them"}},{"i":0,"v":{"game":"Guilty Gear: Strive"}},{"i":1,"v":{"game":"Persona 4 Arena Ultimax","placement":"3"}},{"i":7,"v":{"stream_game":"Virtua Fighter 5"}}],"4/21/2025":[{"i":0,"v":{"game":"Rivals 2"}},{"i":4,"v":{"game":"Virtua Fighter 5"}},{"i":6,"v":{}},{"i":0,"v":{"game":"Ultimate"}},{"i":0,"v":{"game":"Guilty Gear XXAC+R"}},{"i":0,"v":{"game":"Salty Suite (Strive)"}}],"4/22/2025":[{"i":1,"v":{"game":"Under Night","placement":"3"}},{"i":8,"v":{"miscdata":"Has Had A Trials Named After Them"}},{"i":0,"v":{"game":"Mystery Game"}},{"i":0,"v":{"game":"Guilty Gear XXAC+R"}},{"i":0,"v":{"game":"SoulCalibur II"}},{"i":0,"v":{"game":"BlazBlue: Centralfiction"}}],"4/23/2025":[{"i":0,"v":{"game":"Vampire Savior"}},{"i":4,"v":{"game":"Mystery Game"}},{"i":0,"v":{"game":"Street Fighter 6"}},{"i":5,"v":{"win_count":"5"}},{"i":0,"v":{"game":"Melty Blood: Type Lumina"}},{"i":0,"v":{"game":"Kibotsu's After Dark"}}]}
+{
+  "4/20/2025": [
+    {
+      "id": "stream",
+      "v": {}
+    },
+    {
+      "id": "game",
+      "v": {
+        "game": "Strive New Character Bracket"
+      }
+    },
+    {
+      "id": "miscdata",
+      "v": {
+        "miscdata": "Has Had A Trials Named After Them"
+      }
+    },
+    {
+      "id": "game",
+      "v": {
+        "game": "Guilty Gear: Strive"
+      }
+    },
+    {
+      "id": "game_place",
+      "v": {
+        "game": "Persona 4 Arena Ultimax",
+        "placement": "3"
+      }
+    },
+    {
+      "id": "game_stream",
+      "v": {
+        "stream_game": "Virtua Fighter 5"
+      }
+    }
+  ],
+  "4/21/2025": [
+    {
+      "id": "game",
+      "v": {
+        "game": "Rivals 2"
+      }
+    },
+    {
+      "id": "game_win",
+      "v": {
+        "game": "Virtua Fighter 5"
+      }
+    },
+    {
+      "id": "stream",
+      "v": {}
+    },
+    {
+      "id": "game",
+      "v": {
+        "game": "Ultimate"
+      }
+    },
+    {
+      "id": "game",
+      "v": {
+        "game": "Guilty Gear XXAC+R"
+      }
+    },
+    {
+      "id": "game",
+      "v": {
+        "game": "Salty Suite (Strive)"
+      }
+    }
+  ],
+  "4/22/2025": [
+    {
+      "id": "game_place",
+      "v": {
+        "game": "Under Night",
+        "placement": "3"
+      }
+    },
+    {
+      "id": "miscdata",
+      "v": {
+        "miscdata": "Has Had A Trials Named After Them"
+      }
+    },
+    {
+      "id": "game",
+      "v": {
+        "game": "Mystery Game"
+      }
+    },
+    {
+      "id": "game",
+      "v": {
+        "game": "Guilty Gear XXAC+R"
+      }
+    },
+    {
+      "id": "game",
+      "v": {
+        "game": "SoulCalibur II"
+      }
+    },
+    {
+      "id": "game",
+      "v": {
+        "game": "BlazBlue: Centralfiction"
+      }
+    }
+  ],
+  "4/23/2025": [
+    {
+      "id": "game",
+      "v": {
+        "game": "Vampire Savior"
+      }
+    },
+    {
+      "id": "game_win",
+      "v": {
+        "game": "Mystery Game"
+      }
+    },
+    {
+      "id": "game",
+      "v": {
+        "game": "Street Fighter 6"
+      }
+    },
+    {
+      "id": "wins",
+      "v": {
+        "win_count": "5"
+      }
+    },
+    {
+      "id": "game",
+      "v": {
+        "game": "Melty Blood: Type Lumina"
+      }
+    },
+    {
+      "id": "game",
+      "v": {
+        "game": "Kibotsu's After Dark"
+      }
+    }
+  ],
+  "4/24/2025": [
+    {"id": "wins", "v": {"win_count": "5"}},
+    {"id": "game", "v": {"game": "Ultimate"}},
+    {"id": "place_2", "v": {"placement_entrants": "3-16"}},
+    {"id": "game_stream", "v": {"stream_game": "Virtua Fighter 5"}},
+    {"id": "game", "v": {"game": "Guilty Gear XXAC+R"}},
+    {"id": "game_place", "v": {"game": "Granblue Fantasy Versus", "placement": "8"}}
+  ]
+}
 export default pastQueryData

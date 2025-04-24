@@ -1,29 +1,33 @@
 interface GameData {
     date?: string
-    guesses: (string | null)[];
-    lives: number;
+    guesses: (string | null)[]
+    lives: number
 }
 
 interface QueryFile {
-    queries: Query[];
-    vars: {[key: string]: Var};
+    queries: {[key: string]: Query}
+    vars: {[key: string]: Var}
 }
 
 interface Query {
-    label: string;
-    query: string;
-    options?: {[k: string]: string}[]
-    vars?: {[k: string]: string}
-    odds: number;
+    label: string
+    query: string
+    odds: number
+}
+interface VarValue {
+    id: string
+    [key: string]: string
+    odds?: number
 }
 interface Var {
-    values?: string[];
-    labels?: string[];
-    query?: string;
+    strValues?: string[]
+    values?: VarValue[]
+    labels?: string[]
+    query?: string
 }
 interface QueryData {
-    i: number;
-    v: {[k: string]: string};
+    id: string
+    v: {[k: string]: string}
 }
 
 declare module "*/GridQueries.toml" {

@@ -1,7 +1,7 @@
 [vars.game]
 # query = "SELECT Name FROM Event"
 query = """
-select a.Name
+select a.name as id, COUNT(*) AS odds
 from Event a
 WHERE a.ID IN (
 	SELECT b.ID
@@ -9,11 +9,18 @@ WHERE a.ID IN (
 	WHERE b.Name = a.Name
 	LIMIT 30)
 AND EXISTS (SELECT * FROM SetResult s WHERE s.EventID = a.ID)
-order by a.Name
+GROUP BY Name
+ORDER BY Name
 """
 
 [vars.placement]
 values = ["3", "8"]
+
+[vars.placement_entrants]
+values = [{label = "Won", id = "1", placement = "1", entrants = "1", entrantsLabel = ""}, 
+	{label = "Top 3 in", id = "3-8", placement = "3", entrants = "8", entrantsLabel = "(8+ entrants)"},
+	{label = "Top 3 in", id = "3-16", placement = "3", entrants = "16", entrantsLabel = "(16+ entrants)", odds = 0},
+	{label = "Top 8 in", id = "8-16", placement = "8", entrants = "16", entrantsLabel = "(16+ entrants)"}]
 
 [vars.win_count]
 values = ["1", "5", "10"]
@@ -30,16 +37,15 @@ var = "miscdata"
 query = "SELECT name FROM pragma_table_info('MiscData') WHERE name != 'ID'"
 
 [vars.gtlt]
-values = [">", "<"]
-labels = ["above", "below"]
+values = [{id = ">", label = "above"}, {id = "<", label = "below"}]
 
-[[queries]]
+[queries.game]
 label = "[game]"
 query = "SELECT DISTINCT p.Name FROM EVENT e JOIN Standing s ON s.EventID = e.ID JOIN Player p ON p.ID = s.PlayerID WHERE e.Name = \"[game]\""
 odds = 400
 
-[[queries]]
-label = "Placed Top [placement] in [game]"
+[queries.game_place]
+label = "Top [placement] in [game]"
 query = """
 SELECT DISTINCT p.Name FROM EVENT e
 JOIN Standing s ON s.EventID = e.ID
@@ -48,23 +54,21 @@ WHERE e.Name = "[game]" AND s.Standing <= [placement]
 """
 odds = 125
 
-[[queries]]
-label = "Placed Top [placement] in 2 games in the same event (min: [entrantCount] entrants)"
+[queries.place_2]
+label = "[placement_entrants.label] 2 games in the same event [placement_entrants.entrantsLabel]"
 query = """
 SELECT DISTINCT p.Name
 FROM EVENT e
 JOIN (SELECT EventID, COUNT(*) AS Count FROM Standing GROUP BY EventId) entrants ON entrants.EventID = e.ID
 JOIN Standing s ON s.EventID = e.ID
 JOIN Player p ON p.ID = s.PlayerID
-WHERE s.Standing <= [placement] AND entrants.Count >= [entrantCount]
+WHERE s.Standing <= [placement_entrants.placement] AND entrants.Count >= [placement_entrants.entrants]
 GROUP BY e.TournamentID, p.Name
 HAVING COUNT(*) > 1
 """
-vars = ["placement", "entrantCount"]
-options = [{placement = "1", entrantCount = "8"}, {placement = "3", entrantCount = "8"}, {placement = "3", entrantCount = "16"}, {placement = "8", entrantCount = "24"}]
 odds = 25
 
-[[queries]]
+[queries.year]
 label = "Has entered a Trials event in [year]"
 query = """
 select distinct p.Name
@@ -72,11 +76,11 @@ from Tournament t
 join Event e on e.TournamentID = t.id
 join Standing s on s.EventID = e.ID
 join player p on p.id = s.PlayerID
-where strftime('%Y', StartAt, 'unixepoch') = [year]
+where strftime('%Y', StartAt, 'unixepoch') = '[year]'
 """
 odds = 50
 
-[[queries]]
+[queries.game_win]
 label = "[game] winner"
 query = """
 select distinct p.Name
@@ -87,7 +91,7 @@ where s.Standing = 1 and e.Name = "[game]"
 """
 odds = 50
 
-[[queries]]
+[queries.wins]
 label = "Has won [win_count] or more tournaments"
 query = """
 select p.Name
@@ -100,7 +104,7 @@ having count(*) >= [win_count]
 """
 odds = 50
 
-[[queries]]
+[queries.stream]
 label = "Been on stream"
 query = """
 select distinct name
@@ -108,7 +112,7 @@ from (select player1 as name from Stream union select player2 from Stream) s
 """
 odds = 50
 
-[[queries]]
+[queries.game_stream]
 label = "On stream in [stream_game]"
 query = """
 select distinct name
@@ -118,7 +122,7 @@ where s.game = "[stream_game]"
 odds = 50
 
 
-[[queries]]
+[queries.miscdata]
 label = "[miscdata]"
 query = """
 select distinct p.Name
@@ -127,8 +131,8 @@ join MiscData m ON m.id = p.id AND m."[miscdata]" = 'Y'
 """
 odds = 100
 
-[[queries]]
-label = "Average set length [gtlt] 10 minutes"
+[queries.set_len]
+label = "Average set length [gtlt.label] 10 minutes"
 query = """
 select Name
 from Player
@@ -139,8 +143,8 @@ HAVING AVG(r.duration) [gtlt] 600
 """
 odds = 10
 
-[[queries]]
-label = "Lifetime set win % [gtlt] 50% (min 10 games played)"
+[queries.set_win_pct]
+label = "Lifetime set win % [gtlt.label] 50% (min 10 games played)"
 query = """
 select Name
 from Player
@@ -151,12 +155,12 @@ having SUM(w.count) > 10 AND SUM(w.count) * 1.0 / (SUM(w.count) + SUM(l.count)) 
 """
 odds = 10
 
-[[queries]]
+[queries.nov_6]
 label = "November 6th birthday"
 query = """SELECT Name FROM Player WHERE Name IN ("SlabofBeef", "Zeal", "ThereGoesMySanity")"""
 odds = 5
 
-[[queries]]
+[queries.nathan]
 label = "Named Nathan"
 query = """SELECT Name FROM Player WHERE Name IN ("SlabofBeef", "MeatyShield", "Ichi", "Sykom", "Hanu", "Ryft")"""
 odds = 5

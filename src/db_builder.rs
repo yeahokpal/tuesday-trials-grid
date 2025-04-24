@@ -2,7 +2,7 @@ use std::{collections::{HashMap, HashSet}, error::Error, fmt::Debug, time::Durat
 
 use futures::future::try_join_all;
 use graphql_client::{GraphQLQuery, Response};
-use crate::queries::{get_participants, get_player::{self, GetPlayerPlayer}, get_sets, get_tournament, get_tournaments, GetParticipants, GetPlayer, GetSets, GetTournament, GetTournaments, Tournament};
+use crate::{queries::{get_participants, get_player::{self}, get_sets, get_tournament, get_tournaments, GetParticipants, GetPlayer, GetSets, GetTournament, GetTournaments, Tournament}, sheets_data::get_sheets_data};
 use reqwest::Client;
 use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
@@ -18,18 +18,21 @@ async fn make_request<V: Serialize, D: for<'a> Deserialize<'a>>(client: &Client,
         .json().await?)
 }
 
-struct DbBuilderState {
-    client: Client,
-    sql: Connection,
+pub struct DbBuilderState {
+    pub client: Client,
+    pub sql: Connection,
     players: HashSet<String>,
 }
 
-pub async fn build_db() -> Result<(), Box<dyn Error>> {
+pub async fn build_db(force_update: bool) -> Result<(), Box<dyn Error>> {
+
     let mut state = DbBuilderState {
         client: Client::new(),
         sql: Connection::open("./db.sqlite")?,
-        players: HashSet::new()
+        players: HashSet::new(),
     };
+
+    return get_sheets_data(&state).await;
 
     let tournaments = get_paged_query(
     async |page| { make_request(&state.client, &GetTournaments::build_query(get_tournaments::Variables {page: page})).await },
@@ -41,12 +44,14 @@ pub async fn build_db() -> Result<(), Box<dyn Error>> {
     .filter_map(|x| x)
     .filter(|t| t.name.as_ref().unwrap().contains("Trial"))
     {
-        update_tournament(&mut state, Tournament::try_from(tournament)?, false).await?;
+        dbg!(&tournament.name);
+        update_tournament(&mut state, Tournament::try_from(tournament)?, force_update).await?;
     }
-    update_players(&state.client, &state.sql, &mut state.players.iter()).await?;
+    // update_players(&state.client, &state.sql, &mut state.players.iter()).await?;
 
     Ok(())
 }
+
 pub async fn build_last_trials() -> Result<(), Box<dyn Error>> {
     let mut state = DbBuilderState {
         client: Client::new(),
@@ -89,7 +94,7 @@ async fn update_tournament(state: &mut DbBuilderState, tournament: Tournament, f
     }
     dbg!("test1");
     for event in tournament.events.iter().flatten() {
-        sql.execute("INSERT INTO Event VALUES (?1, ?2, ?3) ON CONFLICT DO UPDATE SET name=excluded.name, tournamentId=excluded.tournamentId", (&event.id, &event.name, id))
+        sql.execute("INSERT INTO Event VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING", (&event.id, &event.name, id))
         .expect("Event insert");
     }
     sleep(Duration::from_millis(300)).await;
@@ -138,8 +143,8 @@ async fn update_tournament(state: &mut DbBuilderState, tournament: Tournament, f
                         _ => (None, None) } {
                 if let (Some(winner_id), Some(loser_id)) = (winner.entrant.as_ref().and_then(|e| e.id.as_ref()), loser.entrant.as_ref().and_then(|e| e.id.as_ref())) {
                 if let (Some(winner_player_id), Some(loser_player_id)) = (entrants.get(winner_id), entrants.get(loser_id)) {
-                if let (Some(winner_score), Some(loser_score)) = (winner.standing.as_ref().and_then(|st|st.stats.as_ref()).and_then(|s|s.score.as_ref()).and_then(|sc|sc.value), loser.standing.as_ref().and_then(|st|st.stats.as_ref()).and_then(|s|s.score.as_ref()).and_then(|sc|sc.value)) {
-                    if loser_score >= 0.0 { sql.execute("
+                let (winner_score, loser_score) = (winner.standing.as_ref().and_then(|st|st.stats.as_ref()).and_then(|s|s.score.as_ref()).and_then(|sc|sc.value), loser.standing.as_ref().and_then(|st|st.stats.as_ref()).and_then(|s|s.score.as_ref()).and_then(|sc|sc.value));
+                    sql.execute("
 INSERT INTO SetResult
 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
 ON CONFLICT DO UPDATE
@@ -148,8 +153,8 @@ SET eventID = excluded.eventID
 , loserID = excluded.loserID
 , winnerScore = excluded.winnerScore
 , loserScore = excluded.loserScore
-, duration = excluded.duration", (&set.id, &event.id, winner_player_id, loser_player_id, winner_score, loser_score, started_at.and_then(|s| Some(completed_at - s))))?; }
-                }}}}}}}}
+, duration = excluded.duration", (&set.id, &event.id, winner_player_id, loser_player_id, winner_score, loser_score, started_at.and_then(|s| Some(completed_at - s))))?;
+                }}}}}}}
             }
         }
     }
