@@ -2,36 +2,26 @@ import queryFile from "../GridQueries.toml";
 import { getQueryVars } from "../queryfuncs";
 function EditLabel({data, setData}: {data?: QueryData, setData: (d: QueryData) => void}) {
     function onChangeQuery(newValue: string) {
-        setData({i: Number.parseInt(newValue), v: {}})
-    }
-    function onChangeOption(newValue: string) {
-        setData({i: data!.i, v: JSON.parse(newValue)})
+        setData({id: newValue, v: {}})
     }
     function onChangeVariable(key: string, newValue: string) {
-        setData({i: data!.i, v: {...data!.v, [key]: newValue}});
+        setData({id: data!.id, v: {...data!.v, [key]: newValue}});
     }
     return <div>
         <select onChange={e => onChangeQuery(e.target.value)}>
             <option value=""></option>
-            {queryFile.queries.map((q, i) => 
-            <option key={i} value={i}>{q.label}</option>
+            {Object.entries(queryFile.queries).map(([k, q]) => 
+            <option key={k} value={k}>{q.label}</option>
             )}
         </select>
-        {data && (queryFile.queries[data.i].options?
-            <select onChange={e => onChangeOption(e.target.value)}>
-                <option value="{}"></option>
-                {queryFile.queries[data.i].options?.map(opt => JSON.stringify(opt)).map(str => 
-                <option value={str}>{str}</option>
-                )}
-            </select>
-        : getQueryVars(queryFile, data.i).map(([k, v]) =>
-            <select key={data.i + k} onChange={e => onChangeVariable(k, e.target.value)}>
+        {data && getQueryVars(queryFile, queryFile.queries[data.id]).map(([k, v]) =>
+            <select key={k} onChange={e => onChangeVariable(k, e.target.value)}>
                 <option value=""></option>
-                {[...new Set(v.values)].map((val, i) =>
-                <option value={val}>{queryFile.vars[k].labels?.at(i) ?? val}</option>
+                {(v.values?.map(val => val.id) ?? v.strValues ?? []).map(val =>
+                <option key={val} value={val}>{val}</option>
                 )}
             </select>
-        ))}
+        )}
     </div>;
 }
 export default EditLabel
