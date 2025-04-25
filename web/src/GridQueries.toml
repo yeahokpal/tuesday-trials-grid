@@ -72,6 +72,17 @@ WHERE e.Name = "[game]" AND s.Standing <= [placement]
 """
 odds = 125
 
+[queries.avg_brackets]
+label = "3+ avg. brackets entered per event"
+query = """
+select p.name
+from Player p
+join Standing s on s.playerid = p.id
+join event e on s.eventid = e.id
+group by p.name
+having count(*) * 1.0 / count(distinct tournamentid) >= 3
+"""
+
 [queries.place_2]
 label = "[placement_entrants.label] 2 games in the same event [placement_entrants.entrantsLabel]"
 query = """

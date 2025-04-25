@@ -157,6 +157,46 @@ const pastQueryData: {[date: string]: QueryData[]} =
     {"id": "game_stream", "v": {"stream_game": "Virtua Fighter 5"}},
     {"id": "game", "v": {"game": "Guilty Gear XXAC+R"}},
     {"id": "game_place", "v": {"game": "Granblue Fantasy Versus", "placement": "8"}}
-  ]
+  ],
+  "4/25/2025": 
+  [
+  {
+    "id": "game_win",
+    "v": {
+      "game": "Street Fighter 6"
+    }
+  },
+  {
+    "id": "controller",
+    "v": {
+      "controller": "Leverless"
+    }
+  },
+  {
+    "id": "character",
+    "v": {
+      "game_char": "SF6Zangief"
+    }
+  },
+  {
+    "id": "miscdata",
+    "v": {
+      "miscdata": "NunchuckPup Tattoo"
+    }
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Ultra Fight Da! Kyanta 2"
+    }
+  },
+  {
+    "id": "game_place",
+    "v": {
+      "game": "Granblue Fantasy Versus",
+      "placement": "3"
+    }
+  }
+]
 }
 export default pastQueryData

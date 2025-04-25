@@ -1,6 +1,9 @@
+import { Database } from "sql.js";
+import TrialsGrid from "./TrialsGrid";
+
 export function getQueryVars(queryFile: QueryFile, query: Query) {
     return Object.entries(queryFile.vars)
-        .filter(([k, _]) => query.query.includes(`[${k}`));
+        .filter(([k, _]) => query.query.includes(`[${k}.`) || query.query.includes(`[${k}]`));
 }
 
 export function queryDataEquals(a: QueryData, b: QueryData) {
@@ -22,4 +25,11 @@ export function toQuery(queryFile: QueryFile, d: QueryData) {
         query: varStrings.reduce((str, [k, v]) => str.replace(`[${k}]`, v), q.query),
         label: varStrings.reduce((str, [k, v]) => str.replace(`[${k}]`, v), q.label),
     };
+}
+export function getCustomGrid(db: Database, customData: string | null) {
+  let newData: QueryData[] = JSON.parse(customData ?? "null");
+  if (newData) {
+    let grid = new TrialsGrid(db, newData, true);
+    if (grid.valid) return grid;
+  }
 }
