@@ -89,8 +89,8 @@ class TrialsGrid {
 
             yield {id, v: Object.fromEntries(
                 getQueryVars(queryFile, query).map(([key, value]) => {
-                    const vValues = value.strValues ?? value.values?.filter(val => (key !== "game" && key !== "stream_game") ||
-                            !gameDup.includes(typeof val === 'string'? val : val.name));
+                    const vValues = (value.strValues ?? value.values)?.filter(val => (key !== "game" && key !== "stream_game") ||
+                            !gameDup.includes(typeof val === 'string'? val : val.id));
                     if (!vValues || vValues.length === 0) return [key, ""];
 
                     const oddsArr = vValues.map(v => typeof v !== 'string' && 'odds' in v && v.odds || 1);
@@ -105,7 +105,7 @@ class TrialsGrid {
                     if (typeof res !== 'string' && 'id' in res) {
                         res = res['id'];
                     }
-                    if (typeof res === 'string' && (key === "game" || key === "stream_game")) {
+                    if (key === "game" || key === "stream_game") {
                         gameDup.push(res);
                     }
                     return [key, res];

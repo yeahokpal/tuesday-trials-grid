@@ -25,6 +25,7 @@ function getCustomGrid(db: Database, customData: string | null) {
 function Grid({db, customData}: {db: Database, customData: string | null}) {
   const [today] = useState(() => new Intl.DateTimeFormat("en-US").format(new Date()));
   // const [today] = useState(() => new Date().toISOString());
+  // const [today] = useState(() => "4/25/2025");
   const [players] = useState(() => db.exec("SELECT DISTINCT Name FROM Player ORDER BY Name")[0].values.flat().map(r => r!.toString()));
   const [selected, setSelected] = useState<number|null>(null);
   const [localData, setLocalData] = useLocalStorage<LocalData>("gameData", {});

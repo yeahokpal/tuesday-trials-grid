@@ -47,7 +47,7 @@ pub async fn build_db(force_update: bool) -> Result<(), Box<dyn Error>> {
         dbg!(&tournament.name);
         update_tournament(&mut state, Tournament::try_from(tournament)?, force_update).await?;
     }
-    // update_players(&state.client, &state.sql, &mut state.players.iter()).await?;
+    update_players(&state.client, &state.sql).await?;
 
     Ok(())
 }
@@ -60,24 +60,42 @@ pub async fn build_last_trials() -> Result<(), Box<dyn Error>> {
     };
     let tournament = Tournament::try_from(make_request::<_, get_tournament::ResponseData>(&state.client, &GetTournament::build_query(get_tournament::Variables {slug: "trials".to_string()})).await?.data.expect("no data").tournament.expect("no data"))?;
 
-    update_tournament(&mut state, tournament, true).await
+    update_tournament(&mut state, tournament, true).await?;
+    update_players(&state.client, &state.sql).await?;
+
+    Ok(())
 }
 
 
-pub async fn update_players<'a>(client: &Client, sql: &Connection, players: &mut impl Iterator<Item=&'a String>) -> Result<(), Box<dyn Error>> {
-    for id in players {
-        dbg!(id);
-        sleep(Duration::from_millis(1000)).await;
-        let res = make_request::<_, get_player::ResponseData>(client, &GetPlayer::build_query(get_player::Variables{id: id.clone()})).await?;
-        if let Some(url) = res.data.and_then(|d|d.player)
-            .and_then(|p|p.user)
-            .and_then(|u|u.images)
-            .into_iter().flatten().collect::<Option<Vec<_>>>()
-            .and_then(|images|images.get(0)?.url.clone())
-        {
-            sql.execute("UPDATE Player Set ProfileUrl = ?1 WHERE ID = ?2", (url, id))?;
+pub async fn update_players<'a>(client: &Client, sql: &Connection) -> Result<(), Box<dyn Error>> {
+    let mut stmt = sql.prepare("
+    select * 
+    from (select *, row_number() over (partition by p.name order by (select count(*) from standing where playerid = p.id) desc) rnk FROM Player p) r
+    JOIN Player p ON p.id = r.id
+    where rnk = 1 AND p.Main IS NULL")?;
+    for res in stmt.query_map((), |res| res.get("ID").and_then(|i|Ok(i32::to_string(&i))))? {
+        match res {
+        Ok(id) => {
+            dbg!(&id);
+            sleep(Duration::from_millis(1000)).await;
+            let res = make_request::<_, get_player::ResponseData>(client, &GetPlayer::build_query(get_player::Variables{id: id.clone()})).await?;
+            if let Some(url) = res.data.and_then(|d|d.player)
+                .and_then(|p|p.user)
+                .and_then(|u|u.images)
+                .into_iter().flatten().collect::<Option<Vec<_>>>()
+                .and_then(|images|images.get(0)?.url.clone())
+            {
+                sql.execute("UPDATE Player Set ProfileUrl = ?1 WHERE ID = ?2", (url, id))?;
+            }
+        }
+        Err(e) => {return Err(e.into())}
         }
     }
+
+    sql.execute("UPDATE Player SET Main = 1
+    FROM (select *, row_number() over (partition by p.name order by (select count(*) from standing where playerid = p.id) desc) rnk FROM Player p) r
+    where r.id = Player.id AND r.rnk = 1 AND Player.Main IS NULL
+    ", ())?;
 
     Ok(())
 }

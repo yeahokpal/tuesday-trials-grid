@@ -39,9 +39,27 @@ query = "SELECT name FROM pragma_table_info('MiscData') WHERE name != 'ID'"
 [vars.gtlt]
 values = [{id = ">", label = "above"}, {id = "<", label = "below"}]
 
+[vars.controller]
+query = "SELECT DISTINCT Controller FROM Controller"
+
+[vars.game_char]
+query = """
+SELECT concat(Game, Character) AS id, Game as game, Character as character
+FROM Character
+GROUP BY Game, Character
+HAVING COUNT(*) > 5
+"""
+
+
 [queries.game]
 label = "[game]"
-query = "SELECT DISTINCT p.Name FROM EVENT e JOIN Standing s ON s.EventID = e.ID JOIN Player p ON p.ID = s.PlayerID WHERE e.Name = \"[game]\""
+query = """
+SELECT DISTINCT p.Name FROM EVENT e 
+JOIN Standing s ON s.EventID = e.ID 
+JOIN Player p ON p.ID = s.PlayerID 
+JOIN SetResult sr ON loserScore != -1 AND (winnerID = p.id OR loserID = p.id) AND sr.eventID = e.id
+WHERE e.Name = "[game]"
+"""
 odds = 400
 
 [queries.game_place]
@@ -92,7 +110,7 @@ where s.Standing = 1 and e.Name = "[game]"
 odds = 50
 
 [queries.wins]
-label = "Has won [win_count] or more tournaments"
+label = "[win_count] or more tournament win(s)"
 query = """
 select p.Name
 from Standing s
@@ -121,7 +139,6 @@ where s.game = "[stream_game]"
 """
 odds = 50
 
-
 [queries.miscdata]
 label = "[miscdata]"
 query = """
@@ -130,6 +147,26 @@ from Player p
 join MiscData m ON m.id = p.id AND m."[miscdata]" = 'Y'
 """
 odds = 100
+
+[queries.controller]
+label = "[controller]"
+query = """
+select distinct p.Name
+from Player p
+join Controller c ON c.id = p.id
+WHERE c.Controller = '[controller]'
+"""
+odds = 50
+
+[queries.character]
+label = "[game_char.character] ([game_char.game])"
+query = """
+select distinct p.Name
+from Player p
+JOIN Character c ON p.id = c.id
+WHERE c.Game = '[game_char.game]' AND c.Character = "[game_char.character]"
+"""
+odds = 75
 
 [queries.set_len]
 label = "Average set length [gtlt.label] 10 minutes"
@@ -162,5 +199,5 @@ odds = 5
 
 [queries.nathan]
 label = "Named Nathan"
-query = """SELECT Name FROM Player WHERE Name IN ("SlabofBeef", "MeatyShield", "Ichi", "Sykom", "Hanu", "Ryft")"""
+query = """SELECT Name FROM Player WHERE Name IN ("SlabofBeef", "MeatyShield", "Ichi", "Sykom", "Hanu", "RYfT")"""
 odds = 5
