@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
-import './App.css'
+import { useEffect, useRef, useState } from "react";
+import "./App.css";
 import initSqlJs, { Database } from "sql.js";
 
 import dbFile from "../../db.sqlite?url";
 import sqlWasm from "../node_modules/sql.js/dist/sql-wasm.wasm?url";
-import Grid from './Grid/Grid';
-import EditGrid from './EditGrid/EditGrid';
+import Grid from "./Grid/Grid";
+import EditGrid from "./EditGrid/EditGrid";
 
 function App() {
   const searchParams = new URLSearchParams(window.location.search);
@@ -14,21 +14,21 @@ function App() {
   const [edit, setEdit] = useState(false);
 
   useEffect(() => {
-    initSqlJs({locateFile: () => sqlWasm })
-      .then(SQL => fetch(dbFile)
-        .then(db => db.bytes())
-        .then(bytes => {
+    initSqlJs({ locateFile: () => sqlWasm }).then((SQL) =>
+      fetch(dbFile)
+        .then((db) => db.bytes())
+        .then((bytes) => {
           let db = new SQL.Database(bytes);
           setDb(db);
           // console.debug(JSON.stringify(
           //   Object.fromEntries(["4/20/2025", "4/21/2025", "4/22/2025", "4/23/2025"].map(d => [d, TrialsGrid.getRandomValidGrid(db, d).data]))
           // ));
-    }));
+        })
+    );
   }, []);
 
   function setCustomData(customData: string | null) {
-    if (searchParams.get("customData") != customData)
-    {
+    if (searchParams.get("customData") != customData) {
       searchParams.set("customData", customData ?? "");
       window.location.search = searchParams.toString();
     }
@@ -41,19 +41,64 @@ function App() {
     setEdit(!edit);
   }
 
-  if (db === null) return <>Loading...</>
+  const [sideNavOpen, setSideNavOpen] = useState(false);
+  const sideNavRef = useRef<HTMLDivElement>(null);
+
+  const toggleSideNav = () => {
+    setSideNavOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        sideNavRef.current &&
+        !sideNavRef.current.contains(event.target as Node)
+      ) {
+        setSideNavOpen(false);
+      }
+    };
+
+    if (sideNavOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [sideNavOpen]);
+
+  if (db === null) return <>Loading...</>;
 
   return (
     <>
-      <div style={{position: "absolute", right: "0%"}}>
+      <div className="navButton" onClick={toggleSideNav}>
+        &#9776;
+      </div>
+      <div
+        id="sideNav"
+        ref={sideNavRef}
+        className={sideNavOpen ? "open" : ""}
+      >
         <button onClick={loadData}>Load Custom Grid</button>
-        <br/>
-        <button hidden onClick={editMode}>Toggle Edit Mode</button>
+        <br />
+        <button hidden onClick={editMode}>
+          Toggle Edit Mode
+        </button>
       </div>
       <h1>Tuesday Trials Grid</h1>
-      {edit ? <EditGrid db={db} customData={customData} setCustomData={setCustomData}/> : <Grid key={customData} db={db} customData={customData}/>}
+      {edit ? (
+        <EditGrid
+          db={db}
+          customData={customData}
+          setCustomData={setCustomData}
+        />
+      ) : (
+        <Grid key={customData} db={db} customData={customData} />
+      )}
     </>
-  )
+  );
 }
 
-export default App
+export default App;

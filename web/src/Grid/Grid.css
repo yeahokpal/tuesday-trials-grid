@@ -1,7 +1,8 @@
 .grid {
     display: grid;
-    grid: auto / 20% 20% 20% 20% 20%;
+    grid: auto / 18% 18% 18% 18% 18%;
     align-items: center;
+    justify-content: center;
     max-width: 100vw;
 }
 .gridSquare {

@@ -39,10 +39,11 @@ button {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
+  margin-bottom: 1.5rem;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #808080;
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -65,4 +66,63 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+.mainGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr 2fr 0.25fr;
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+}
+
+#sideNav {
+  height: 100%;
+  width: 20rem;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #1a1a1a;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: transform 0.5s ease;
+
+  transform: translateX(-100%);
+}
+
+/* When the sidebar is open */
+#sideNav.open {
+  transform: translateX(0);
+}
+
+
+.sideNav a {
+  padding: 0.25rem;
+  font-size: 1em;
+  color: white;
+  display: block;
+  transition: 0.3s;
+}
+
+.sideNav a:hover {
+  color: purple;
+}
+
+.sideNav .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+}
+
+.navButton {
+  font-size:3rem;
+  cursor:pointer;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding-top: 0.25rem;
+  padding-left: 0.5rem;
 }
