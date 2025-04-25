@@ -96,7 +96,6 @@ button:focus-visible {
   transform: translateX(0);
 }
 
-
 .sideNav a {
   padding: 0.25rem;
   font-size: 1em;
@@ -125,4 +124,14 @@ button:focus-visible {
   left: 0;
   padding-top: 0.25rem;
   padding-left: 0.5rem;
+}
+
+.sideNavItems {
+  display: flex;
+  flex-direction: column;
+  margin-left: 2rem;
+  margin-right: 2rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+
 }

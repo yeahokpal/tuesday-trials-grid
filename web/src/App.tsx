@@ -6,6 +6,7 @@ import dbFile from "../../db.sqlite?url";
 import sqlWasm from "../node_modules/sql.js/dist/sql-wasm.wasm?url";
 import Grid from "./Grid/Grid";
 import EditGrid from "./EditGrid/EditGrid";
+import Report from "./Report/Report"
 
 function App() {
   const searchParams = new URLSearchParams(window.location.search);
@@ -39,6 +40,9 @@ function App() {
   }
   function editMode() {
     setEdit(!edit);
+  }
+  function showReport() {
+    
   }
 
   const [sideNavOpen, setSideNavOpen] = useState(false);
@@ -81,11 +85,11 @@ function App() {
         ref={sideNavRef}
         className={sideNavOpen ? "open" : ""}
       >
-        <button onClick={loadData}>Load Custom Grid</button>
-        <br />
-        <button hidden onClick={editMode}>
-          Toggle Edit Mode
-        </button>
+        <div className="sideNavItems">
+          <button onClick={loadData}>Load Custom Grid</button>
+          <button onClick={showReport}>Report Issue</button>
+          {/* <button onClick={editMode}>Toggle Edit Mode</button> */}
+        </div>
       </div>
       <h1>Tuesday Trials Grid</h1>
       {edit ? (
