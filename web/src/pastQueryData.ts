@@ -197,6 +197,41 @@ const pastQueryData: {[date: string]: QueryData[]} =
       "placement": "3"
     }
   }
+],
+"4/26/2025": [
+  {
+    "id": "game",
+    "v": {
+      "game": "Street Fighter 6"
+    }
+  },
+  {
+    "id": "avg_brackets",
+    "v": {}
+  },
+  {
+    "id": "miscdata",
+    "v": {
+      "miscdata": "SCUM Esports"
+    }
+  },
+  {
+    "id": "game_place",
+    "v": {
+      "game": "Mystery Game",
+      "placement": "3"
+    }
+  },
+  {
+    "id": "stream",
+    "v": {}
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Guilty Gear XXAC+R"
+    }
+  }
 ]
 }
 export default pastQueryData
