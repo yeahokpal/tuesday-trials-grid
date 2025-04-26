@@ -14,6 +14,7 @@ import Results from "../Results/Results";
 import { calcLocalStats } from "../calcLocalStats";
 import { useMediaQuery } from "@mui/material";
 import pastQueryData from "../pastQueryData";
+import { getCustomGrid } from "../queryfuncs";
 
 function VersusGrid({db, customData, }: {db: Database, customData: string | null}) {
   const [today] = useState(() => new Intl.DateTimeFormat("en-US").format(new Date()));
