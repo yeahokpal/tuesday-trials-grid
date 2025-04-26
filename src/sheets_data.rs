@@ -6,48 +6,51 @@ use crate::db_builder::DbBuilderState;
 
 pub async fn get_sheets_data(state: &DbBuilderState) -> Result<(), Box<dyn Error>> {
     let sheet_id = env::var("SHEET_ID")?;
-    let dedup = state.client.get(format!("https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet=Game%20Deduplication"))
-        .send().await?.bytes().await?;
-    let playerdata = state.client.get(format!("https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet=Player%20Data"))
-        .send().await?.bytes().await?;
-    let streamdata = state.client.get(format!("https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet=Stream%20Data"))
-        .send().await?.bytes().await?;
-
-    fs::File::create("dedup.csv")?.write(&dedup)?;
-    fs::File::create("playerdata.csv")?.write(&playerdata)?;
-    fs::File::create("streamdata.csv")?.write(&streamdata)?;
     csvtab::load_module(&state.sql)?;
-
+    for sheet in vec!["Game Deduplication", "Player Data", "Stream Data", "Stream Rename", "Stream Player Rename"] {
+        let urlify = sheet.replace(' ', "%20");
+        let data = state.client.get(format!("https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={urlify}"))
+            .send().await?.bytes().await?;
+        let db_name = sheet.replace(' ', "");
+        fs::File::create(format!("{db_name}.csv"))?.write(&data)?;
+        
+        state.sql.execute(format!("DROP TABLE IF EXISTS temp.{db_name}").as_str(), [])?;
+        state.sql.execute(format!("CREATE VIRTUAL TABLE temp.{db_name} USING csv(filename='{db_name}.csv', header=TRUE)").as_str(), [])?;
+    }
 
     for stmt in vec![
-    "DROP TABLE IF EXISTS temp.dedup",
-    "DROP TABLE IF EXISTS temp.playerdat",
-    "DROP TABLE IF EXISTS temp.streamdata",
-    "CREATE VIRTUAL TABLE temp.dedup USING csv(filename='dedup.csv', header=TRUE)",
-    "CREATE VIRTUAL TABLE temp.playerdat USING csv(filename='playerdata.csv', header=TRUE)",
-    "CREATE VIRTUAL TABLE temp.streamdata USING csv(filename='streamdata.csv', header=TRUE)",
-
     "UPDATE Event
     SET Name = dedup.[Rename To]
-    FROM temp.dedup dedup
+    FROM temp.GameDeduplication dedup
     WHERE Event.Name = dedup.Name
     AND dedup.[Rename To] > ''",
 
-    "DELETE FROM Event WHERE Name IN (SELECT Name FROM temp.dedup WHERE [Delete] = 'Y')",
+    "DELETE FROM Event WHERE Name IN (SELECT Name FROM temp.GameDeduplication WHERE [Delete] = 'Y')",
 
     "UPDATE Player
     SET Name = playerdat.[Rename To]
-    FROM temp.playerdat playerdat
+    FROM temp.PlayerData playerdat
     WHERE Player.ID = playerdat.ID AND playerdat.[Rename To] > ''",
 
     "DELETE FROM Stream",
-    "DELETE FROM Character",
     "INSERT INTO Stream
-    SELECT * FROM temp.streamdata",
+    SELECT DISTINCT Title, COALESCE(sr.[Rename To], sd.Game) AS Game
+    , COALESCE(sp1.[Rename To], p1.[Rename To], sd.player1) AS Player1
+    , COALESCE(sp2.[Rename To], p2.[Rename To], sd.player2) AS Player2
+    FROM temp.StreamData sd
+    LEFT JOIN temp.StreamRename sr ON sd.Game = sr.Game AND sr.[Rename To] > ''
+    LEFT JOIN temp.StreamPlayerRename sp1 ON sp1.Name = sd.Player1 AND sp1.[Rename To] > ''
+    LEFT JOIN temp.StreamPlayerRename sp2 ON sp2.Name = sd.Player2 AND sp2.[Rename To] > ''
+    LEFT JOIN temp.PlayerData p1 ON p1.Name = sd.player1 AND p1.[Rename To] > ''
+    LEFT JOIN temp.PlayerData p2 ON p2.Name = sd.player2 AND p2.[Rename To] > ''
+    WHERE sd.Game > ''",
+
     "DELETE FROM Controller",
     "INSERT INTO Controller
-    SELECT ID, TRIM(Controller) FROM temp.playerdat
-    WHERE Controller > ''"
+    SELECT ID, TRIM(Controller) FROM temp.PlayerData
+    WHERE Controller > ''",
+
+    "DELETE FROM Character"
     ] {
         let res = state.sql.execute(stmt, [])?;
         dbg!(res);
