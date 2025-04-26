@@ -74,16 +74,17 @@ class TrialsGrid {
         let queryDup: string[] = [];
         let gameDup: string[] = [];
         const queries = Object.entries(queryFile.queries);
-        const max = queries.map(q => q[1].odds).reduce((a, b) => a + b);
+        const oddsArr = queries.map(q => q[1].odds ?? 50);
+        const max = oddsArr.reduce((a, b) => a + b);
         for (let count = 0; count < limit; count++) {
             let i;
             do {
                 let val = prand.unsafeUniformIntDistribution(0, max - 1, rand);
                 i = 0;
-                for (;i < queries.length && val - queries[i][1].odds > 0; i++) {
-                    val -= queries[i][1].odds;
+                for (;i < oddsArr.length && val - oddsArr[i] > 0; i++) {
+                    val -= oddsArr[i];
                 }
-            } while (queries[i][1].odds <= 50 && queryDup.includes(queries[i][0]));
+            } while (oddsArr[i] <= 50 && queryDup.includes(queries[i][0]));
             const [id, query] = queries[i];
             queryDup.push(id);
 
@@ -121,6 +122,7 @@ class TrialsGrid {
         let grid;
         do {
             grid = new TrialsGrid(sql, Array.from(TrialsGrid.getRandomQueries(rand, ROWS + COLUMNS)), true);
+            console.log("nope");
         } while (!grid.valid && ++badqueries);
         console.log("Generated %d grids", badqueries);
 

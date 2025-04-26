@@ -82,6 +82,7 @@ join event e on s.eventid = e.id
 group by p.name
 having count(*) * 1.0 / count(distinct tournamentid) >= 3
 """
+odds = 50
 
 [queries.place_2]
 label = "[placement_entrants.label] 2 games in the same event [placement_entrants.entrantsLabel]"
