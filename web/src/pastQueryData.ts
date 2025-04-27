@@ -197,6 +197,79 @@ const pastQueryData: {[date: string]: QueryData[]} =
       "placement": "3"
     }
   }
+],
+"4/26/2025": [
+  {
+    "id": "game",
+    "v": {
+      "game": "Street Fighter 6"
+    }
+  },
+  {
+    "id": "avg_brackets",
+    "v": {}
+  },
+  {
+    "id": "miscdata",
+    "v": {
+      "miscdata": "SCUM Esports"
+    }
+  },
+  {
+    "id": "game_place",
+    "v": {
+      "game": "Mystery Game",
+      "placement": "3"
+    }
+  },
+  {
+    "id": "stream",
+    "v": {}
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Guilty Gear XXAC+R"
+    }
+  }
+],
+  "4/27/2025": [
+  {
+    "id": "character",
+    "v": {
+      "game_char": "SF6Lily"
+    }
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Mystery Game"
+    }
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Virtua Fighter 5"
+    }
+  },
+  {
+    "id": "place_2",
+    "v": {
+      "placement_entrants": "1"
+    }
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Tekken 8"
+    }
+  },
+  {
+    "id": "game_stream",
+    "v": {
+      "stream_game": "Guilty Gear: Strive"
+    }
+  }
 ]
 }
 export default pastQueryData

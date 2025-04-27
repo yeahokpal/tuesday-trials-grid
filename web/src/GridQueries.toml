@@ -72,6 +72,35 @@ WHERE e.Name = "[game]" AND s.Standing <= [placement]
 """
 odds = 125
 
+[queries.miscdata]
+label = "[miscdata]"
+query = """
+select distinct p.Name
+from Player p
+join MiscData m ON m.id = p.id AND m."[miscdata]" = 'Y'
+"""
+odds = 100
+
+[queries.character]
+label = "[game_char.character] ([game_char.game])"
+query = """
+select distinct p.Name
+from Player p
+JOIN Character c ON p.id = c.id
+WHERE c.Game = '[game_char.game]' AND c.Character = "[game_char.character]"
+"""
+odds = 75
+
+[queries.controller]
+label = "[controller]"
+query = """
+select distinct p.Name
+from Player p
+join Controller c ON c.id = p.id
+WHERE c.Controller = '[controller]'
+"""
+odds = 60
+
 [queries.avg_brackets]
 label = "3+ avg. brackets entered per event"
 query = """
@@ -82,20 +111,7 @@ join event e on s.eventid = e.id
 group by p.name
 having count(*) * 1.0 / count(distinct tournamentid) >= 3
 """
-
-[queries.place_2]
-label = "[placement_entrants.label] 2 games in the same event [placement_entrants.entrantsLabel]"
-query = """
-SELECT DISTINCT p.Name
-FROM EVENT e
-JOIN (SELECT EventID, COUNT(*) AS Count FROM Standing GROUP BY EventId) entrants ON entrants.EventID = e.ID
-JOIN Standing s ON s.EventID = e.ID
-JOIN Player p ON p.ID = s.PlayerID
-WHERE s.Standing <= [placement_entrants.placement] AND entrants.Count >= [placement_entrants.entrants]
-GROUP BY e.TournamentID, p.Name
-HAVING COUNT(*) > 1
-"""
-odds = 25
+odds = 50
 
 [queries.year]
 label = "Has entered a Trials event in [year]"
@@ -150,34 +166,19 @@ where s.game = "[stream_game]"
 """
 odds = 50
 
-[queries.miscdata]
-label = "[miscdata]"
+[queries.place_2]
+label = "[placement_entrants.label] 2 games in the same event [placement_entrants.entrantsLabel]"
 query = """
-select distinct p.Name
-from Player p
-join MiscData m ON m.id = p.id AND m."[miscdata]" = 'Y'
+SELECT DISTINCT p.Name
+FROM EVENT e
+JOIN (SELECT EventID, COUNT(*) AS Count FROM Standing GROUP BY EventId) entrants ON entrants.EventID = e.ID
+JOIN Standing s ON s.EventID = e.ID
+JOIN Player p ON p.ID = s.PlayerID
+WHERE s.Standing <= [placement_entrants.placement] AND entrants.Count >= [placement_entrants.entrants]
+GROUP BY e.TournamentID, p.Name
+HAVING COUNT(*) > 1
 """
-odds = 100
-
-[queries.controller]
-label = "[controller]"
-query = """
-select distinct p.Name
-from Player p
-join Controller c ON c.id = p.id
-WHERE c.Controller = '[controller]'
-"""
-odds = 50
-
-[queries.character]
-label = "[game_char.character] ([game_char.game])"
-query = """
-select distinct p.Name
-from Player p
-JOIN Character c ON p.id = c.id
-WHERE c.Game = '[game_char.game]' AND c.Character = "[game_char.character]"
-"""
-odds = 75
+odds = 25
 
 [queries.set_len]
 label = "Average set length [gtlt.label] 10 minutes"
@@ -211,4 +212,14 @@ odds = 5
 [queries.nathan]
 label = "Named Nathan"
 query = """SELECT Name FROM Player WHERE Name IN ("SlabofBeef", "MeatyShield", "Ichi", "Sykom", "Hanu", "RYfT")"""
+odds = 5
+
+[queries.pfp]
+label = "No profile pic on start.gg"
+query = """
+select Name
+from Player
+group by Name
+having count(profileurl) = 0
+"""
 odds = 5
