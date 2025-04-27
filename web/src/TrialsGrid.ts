@@ -70,39 +70,36 @@ class TrialsGrid {
         this.valid = this.verifyGrid();
     }
 
-    static getRandomQueries = function* (rand: RandomGenerator, limit: number) {
-        let queryDup: string[] = [];
+    static getRandomQueries(rand: RandomGenerator, limit: number) {
+        let generated: QueryData[] = [];
         let gameDup: string[] = [];
         const queries = Object.entries(queryFile.queries);
         const oddsArr = queries.map(q => q[1].odds ?? 50);
         const max = oddsArr.reduce((a, b) => a + b);
-        for (let count = 0; count < limit; count++) {
-            let i;
-            do {
-                let val = prand.unsafeUniformIntDistribution(0, max - 1, rand);
-                i = 0;
-                for (;i < oddsArr.length && val - oddsArr[i] > 0; i++) {
-                    val -= oddsArr[i];
-                }
-            } while (oddsArr[i] <= 50 && queryDup.includes(queries[i][0]));
+        while(generated.length < limit) {
+            let val = prand.unsafeUniformIntDistribution(0, max - 1, rand);
+            let i = 0;
+            for (;i < oddsArr.length && val - oddsArr[i] >= 0; i++) {
+                val -= oddsArr[i];
+            }
             const [id, query] = queries[i];
-            queryDup.push(id);
 
-            yield {id, v: Object.fromEntries(
+            let newQ: QueryData = {id, v: Object.fromEntries(
                 getQueryVars(queryFile, query).map(([key, value]) => {
                     const vValues = (value.strValues ?? value.values)?.filter(val => (key !== "game" && key !== "stream_game") ||
                             !gameDup.includes(typeof val === 'string'? val : val.id));
                     if (!vValues || vValues.length === 0) return [key, ""];
 
-                    const oddsArr = vValues.map(v => typeof v !== 'string' && 'odds' in v && v.odds || 1);
+                    const oddsArr = vValues.map(v => typeof v !== 'string'? v.odds ?? 1 : 1);
                     const odds = oddsArr.reduce((a, b) => a + b) ?? 0;
-                    let r = prand.unsafeUniformIntDistribution(0, odds, rand);
+                    let r = prand.unsafeUniformIntDistribution(0, odds - 1, rand);
                     let i = 0;
-                    for (;i < vValues?.length && r - oddsArr[i] > 0; i++) {
+                    for (;i < vValues?.length && r - oddsArr[i] >= 0; i++) {
                         r -= oddsArr[i];
                     }
                     
                     let res = vValues.at(i) ?? "";
+
                     if (typeof res !== 'string' && 'id' in res) {
                         res = res['id'];
                     }
@@ -112,7 +109,11 @@ class TrialsGrid {
                     return [key, res];
                 }))
             };
+
+            if (generated.every(q => !queryDataEquals(newQ, q)))
+                generated.push(newQ);
         }
+        return generated;
     }
 
     static getRandomValidGrid(sql: Database, seed: string): TrialsGrid {
@@ -121,10 +122,9 @@ class TrialsGrid {
         let badqueries = 0;
         let grid;
         do {
-            grid = new TrialsGrid(sql, Array.from(TrialsGrid.getRandomQueries(rand, ROWS + COLUMNS)), true);
-            console.log("nope");
+            grid = new TrialsGrid(sql, TrialsGrid.getRandomQueries(rand, ROWS + COLUMNS), true);
         } while (!grid.valid && ++badqueries);
-        console.log("Generated %d grids", badqueries);
+        console.log("Generated %d bad grids", badqueries);
 
         return grid;
     }

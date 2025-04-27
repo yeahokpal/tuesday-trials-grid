@@ -76,7 +76,8 @@ function Grid({db, customData}: {db: Database, customData: string | null}) {
 
   const [grid] = useState(() => {
     let g = getCustomGrid(db, customData) ?? (pastQueryData[today]? new TrialsGrid(db, pastQueryData[today], false) : TrialsGrid.getRandomValidGrid(db, today))
-    console.log(g);
+    console.log(g.answers);
+    console.log(g.data);
     return g;
   });
 
