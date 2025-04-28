@@ -270,6 +270,44 @@ const pastQueryData: {[date: string]: QueryData[]} =
       "stream_game": "Guilty Gear: Strive"
     }
   }
+],
+  "4/28/2025":[
+  {
+    "id": "game",
+    "v": {
+      "game": "KOFXV"
+    }
+  },
+  {
+    "id": "year",
+    "v": {
+      "year": "2025"
+    }
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Granblue Fantasy Versus"
+    }
+  },
+  {
+    "id": "character",
+    "v": {
+      "game_char": "SF6Manon"
+    }
+  },
+  {
+    "id": "miscdata",
+    "v": {
+      "miscdata": "TRULY Esports"
+    }
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "FTCrash"
+    }
+  }
 ]
 }
 export default pastQueryData
