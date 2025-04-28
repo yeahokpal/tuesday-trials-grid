@@ -16,10 +16,7 @@ import { useMediaQuery } from "@mui/material";
 import pastQueryData from "../pastQueryData";
 import { getCustomGrid } from "../queryfuncs";
 
-function VersusGrid({db, customData, }: {db: Database, customData: string | null}) {
-  const [today] = useState(() => new Intl.DateTimeFormat("en-US").format(new Date()));
-  // const [today] = useState(() => new Date().toISOString());
-  // const [today] = useState(() => "4/25/2025");
+function VersusGrid({db, host, events, data}: {db: Database, host: boolean, events: EventSource, data: QueryData}) {
   const [players] = useState(() => db.exec("SELECT DISTINCT Name FROM Player ORDER BY Name")[0].values.flat().map(r => r!.toString()));
   const [selected, setSelected] = useState<number|null>(null);
   const [localData, setLocalData] = useLocalStorage<LocalData>("gameData", {});
