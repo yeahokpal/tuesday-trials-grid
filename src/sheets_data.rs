@@ -56,13 +56,13 @@ pub async fn get_sheets_data(state: &DbBuilderState) -> Result<(), Box<dyn Error
         dbg!(res);
     }
 
-    let miscdata: Vec<String> = state.sql.prepare("SELECT name FROM pragma_table_info('playerdat') WHERE cid > 5")?
+    let miscdata: Vec<String> = state.sql.prepare("SELECT name FROM pragma_table_info('PlayerData') WHERE cid > 5")?
         .query_map((), |row|row.get("name"))?
         .collect::<Result<_, _>>()?;
 
     for col in miscdata.iter().filter(|s|s.contains("Chars Played"))
     {
-        let playerdata: Vec<(String, String)> = state.sql.prepare(format!("SELECT ID, [{col}] FROM playerdat WHERE [{col}] > ''").as_str())?
+        let playerdata: Vec<(String, String)> = state.sql.prepare(format!("SELECT ID, [{col}] FROM temp.PlayerData WHERE [{col}] > ''").as_str())?
             .query_map((), |row|Ok((row.get("ID")?, row.get(col.as_str())?)))?
             .collect::<Result<_, _>>()?;
         let game_name = col.replace(" Chars Played", "");
@@ -89,7 +89,7 @@ pub async fn get_sheets_data(state: &DbBuilderState) -> Result<(), Box<dyn Error
 
     state.sql.execute(format!("
     INSERT INTO MiscData
-    SELECT ID, {cols} FROM playerdat
+    SELECT ID, {cols} FROM temp.PlayerData
     WHERE {cols_where};
     ").as_str(), ())?;
 
