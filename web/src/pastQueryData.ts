@@ -308,6 +308,81 @@ const pastQueryData: {[date: string]: QueryData[]} =
       "game": "FTCrash"
     }
   }
+],
+"4/29/2025": [
+  {
+    "id": "game_win",
+    "v": {
+      "game": "Fantasy Strike"
+    }
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Guilty Gear Xrd REV2"
+    }
+  },
+  {
+    "id": "game_win",
+    "v": {
+      "game": "Salty Suite (SF6)"
+    }
+  },
+  {
+    "id": "controller",
+    "v": {
+      "controller": "Pad"
+    }
+  },
+  {
+    "id": "character",
+    "v": {
+      "game_char": "GGSTSol"
+    }
+  },
+  {
+    "id": "wins",
+    "v": {
+      "win_count": "1"
+    }
+  }
+],
+
+"4/30/2025": [
+  {
+    "id": "game",
+    "v": {
+      "game": "Tekken 8"
+    }
+  },
+  {
+    "id": "character",
+    "v": {
+      "game_char": "SF6Juri"
+    }
+  },
+  {
+    "id": "miscdata",
+    "v": {
+      "miscdata": "NunchuckPup Tattoo"
+    }
+  },
+  {
+    "id": "year",
+    "v": {
+      "year": "2022"
+    }
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Virtua Fighter 5"
+    }
+  },
+  {
+    "id": "stream",
+    "v": {}
+  }
 ]
 }
 export default pastQueryData
