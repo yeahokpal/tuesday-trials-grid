@@ -110,7 +110,6 @@ async fn update_tournament(state: &mut DbBuilderState, tournament: Tournament, f
     if rows == 0 && !force_update {
         return Ok(());
     }
-    dbg!("test1");
     for event in tournament.events.iter().flatten() {
         sql.execute("INSERT INTO Event VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING", (&event.id, &event.name, id))
         .expect("Event insert");
