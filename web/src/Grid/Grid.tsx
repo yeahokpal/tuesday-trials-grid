@@ -128,7 +128,7 @@ ${[0, 1, 2].map(i => guesses.slice(i * 3, i * 3 + 3))
             (statistics.guesses[i] * 100 / statistics.totalGuesses[i]).toPrecision(3) + "%")}
         </div>
         }
-        <Square chosen={guesses[i]} select={() => !complete && setSelected(i)} selected={selected === i} db={db}/>
+        <Square chosen={guesses[i]} select={() => !complete && !guesses[i] && setSelected(i)} selected={selected === i} db={db}/>
       </div>)}
       <div style={{gridRow: (mobile? 5 : 2), gridColumn: (mobile? 1 : 5), alignContent: "center", gridColumnEnd: (mobile? 5 : undefined)}}>
         <h1>{hearts}</h1>
@@ -138,7 +138,7 @@ ${[0, 1, 2].map(i => guesses.slice(i * 3, i * 3 + 3))
         <button onClick={() => setResultsVisible(true)}>View Stats</button>
       </div>}
     </div>
-    <SearchBar key={selected} choices={guesses.filter(c => c != null)} choose={choose} options={players} visible={selected !== null} hide={() => setSelected(null)}/>
+    <SearchBar key={selected} used={guesses.filter(c => c != null)} choose={choose} options={players} visible={selected !== null} hide={() => setSelected(null)}/>
     {resultsVisible && <Results
         visible={resultsVisible}
         hide={() => setResultsVisible(false)}

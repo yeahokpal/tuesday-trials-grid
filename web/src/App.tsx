@@ -6,12 +6,15 @@ import dbFile from "../../db.sqlite?url";
 import sqlWasm from "../node_modules/sql.js/dist/sql-wasm.wasm?url";
 import Grid from './Grid/Grid';
 import EditGrid from './EditGrid/EditGrid';
+import { useVersusConnection } from './VersusGrid/useVersusConnection';
+import VersusGrid from './VersusGrid/VersusGrid';
 
 function App() {
   const searchParams = new URLSearchParams(window.location.search);
   const customData = searchParams.get("customData");
   const [db, setDb] = useState<Database | null>(null);
   const [edit, setEdit] = useState(false);
+  const versus = useVersusConnection(db);
 
   useEffect(() => {
     initSqlJs({locateFile: () => sqlWasm })
@@ -24,6 +27,13 @@ function App() {
           //   Object.fromEntries(["4/20/2025", "4/21/2025", "4/22/2025", "4/23/2025"].map(d => [d, TrialsGrid.getRandomValidGrid(db, d).data]))
           // ));
     }));
+  }, []);
+
+  useEffect(() => {
+    if (searchParams.has("host") && searchParams.has("id")) {
+      versus.setHost(searchParams.get("host") === "true");
+      versus.setId(searchParams.get("id"));
+    }
   }, []);
 
   function setCustomData(customData: string | null) {
@@ -51,7 +61,9 @@ function App() {
         <button hidden onClick={editMode}>Toggle Edit Mode</button>
       </div>
       <h1>Tuesday Trials Grid</h1>
-      {edit ? <EditGrid db={db} customData={customData} setCustomData={setCustomData}/> : <Grid key={customData} db={db} customData={customData}/>}
+      {edit && <EditGrid db={db} customData={customData} setCustomData={setCustomData}/>}
+      {versus.connected && <VersusGrid db={db} connection={versus}/>}
+      {!edit && !versus.connected && <Grid key={customData} db={db} customData={customData}/>}
     </>
   )
 }

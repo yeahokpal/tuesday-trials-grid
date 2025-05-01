@@ -1,9 +1,9 @@
 import { useState } from "react";
 import "./SearchBar.css"
 import SearchOption from "./SearchOption";
-function SearchBar({choices, choose, options, visible, hide}: 
+function SearchBar({used, choose, options, visible, hide}: 
         {
-            choices: string[],
+            used: string[],
             choose: (choice: string) => boolean | undefined, 
             options: string[],
             visible: boolean,
@@ -20,7 +20,7 @@ function SearchBar({choices, choose, options, visible, hide}:
                 autoFocus/>
             {/^\s*$/.test(input)? <></> :
                 options.filter(o => (o.toLowerCase().includes(input.toLowerCase())))
-                    .map(o => <SearchOption key={o} value={o} choose={choices.includes(o)? undefined : choose}/>)
+                    .map(o => <SearchOption key={o} value={o} choose={used.includes(o)? undefined : choose}/>)
             }
         </div>
     </div>
