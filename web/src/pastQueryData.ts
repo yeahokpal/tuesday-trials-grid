@@ -383,6 +383,81 @@ const pastQueryData: {[date: string]: QueryData[]} =
     "id": "stream",
     "v": {}
   }
+],
+"5/1/2025":[
+  {
+    "id": "avg_brackets",
+    "v": {}
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Virtua Fighter 5"
+    }
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Under Night"
+    }
+  },
+  {
+    "id": "game_place",
+    "v": {
+      "game": "Persona 4 Arena Ultimax",
+      "placement": "3"
+    }
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Mystery Game"
+    }
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "SoulCalibur II"
+    }
+  }
+],
+"5/2/2025":[
+  {
+    "id": "year",
+    "v": {
+      "year": "2023"
+    }
+  },
+  {
+    "id": "year",
+    "v": {
+      "year": "2021"
+    }
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Strive New Character Bracket"
+    }
+  },
+  {
+    "id": "game_stream",
+    "v": {
+      "stream_game": "Street Fighter 6"
+    }
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Under Night"
+    }
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Mortal Kombat 1"
+    }
+  }
 ]
 }
 export default pastQueryData
