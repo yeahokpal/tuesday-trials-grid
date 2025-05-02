@@ -32,7 +32,6 @@ pub async fn build_db(force_update: bool) -> Result<(), Box<dyn Error>> {
         players: HashSet::new(),
     };
 
-    return get_sheets_data(&state).await;
 
     let tournaments = get_paged_query(
     async |page| { make_request(&state.client, &GetTournaments::build_query(get_tournaments::Variables {page: page})).await },
@@ -48,6 +47,7 @@ pub async fn build_db(force_update: bool) -> Result<(), Box<dyn Error>> {
         update_tournament(&mut state, Tournament::try_from(tournament)?, force_update).await?;
     }
     update_players(&state.client, &state.sql).await?;
+    get_sheets_data(&state).await?;
 
     Ok(())
 }
@@ -62,6 +62,7 @@ pub async fn build_last_trials() -> Result<(), Box<dyn Error>> {
 
     update_tournament(&mut state, tournament, true).await?;
     update_players(&state.client, &state.sql).await?;
+    get_sheets_data(&state).await?;
 
     Ok(())
 }
@@ -130,12 +131,13 @@ async fn update_tournament(state: &mut DbBuilderState, tournament: Tournament, f
         }
         for entrant in participant.entrants.into_iter().flatten().filter_map(|x| x) {
             entrants.insert(entrant.id.as_ref().expect("").clone(), pid.clone());
-            if entrant.standing.as_ref().and_then(|f|f.is_final).unwrap_or(false) {
+            if let Some(placement) = entrant.standing.and_then(|s|s.placement) {
                 sql.execute("INSERT INTO Standing VALUES (?1, ?2, ?3) ON CONFLICT DO UPDATE SET standing=excluded.standing", 
                     (&pid, 
-                        entrant.event.expect("").id.expect(""), 
-                        entrant.standing.unwrap().placement.unwrap()
+                        entrant.event.unwrap().id.unwrap(), 
+                        placement
                     )).expect("Standing insert");
+
             }
         }
     }
