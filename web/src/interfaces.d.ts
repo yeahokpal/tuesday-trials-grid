@@ -41,6 +41,7 @@ interface ApiResponse {
     totalCorrect: number,
     guesses: (number|null)[],
     totalGuesses: number[],
+    weekly: {name: string, count: number}[],
 }
 
 interface LocalData {

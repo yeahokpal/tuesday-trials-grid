@@ -39,6 +39,15 @@ function Results({visible, hide, localStats, statistics, name, setName, copyResu
                 }
                 <button style={{gridColumn: 2, gridRowStart: 1, gridRowEnd: 3}} onClick={copyResults}>Copy Results</button>
             </div>
+            <h3>Weekly Leaderboard</h3>
+            <div style={{display: "grid"}}>
+                {statistics.weekly.sort((a, b) => b.count - a.count).map(w =>
+                <>
+                    <p className="leaderboardText">{w.name}</p>
+                    <p className="leaderboardText" style={{gridColumn: 2}}>{w.count}</p>
+                </>
+                )}
+            </div>
         </div>
     </div>
 }
