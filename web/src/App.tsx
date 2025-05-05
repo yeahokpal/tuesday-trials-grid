@@ -16,9 +16,9 @@ function App() {
   useEffect(() => {
     initSqlJs({locateFile: () => sqlWasm })
       .then(SQL => fetch(dbFile)
-        .then(db => db.bytes())
+        .then(db => db.arrayBuffer())
         .then(bytes => {
-          let db = new SQL.Database(bytes);
+          let db = new SQL.Database(new Uint8Array(bytes));
           setDb(db);
           // console.debug(JSON.stringify(
           //   Object.fromEntries(["4/20/2025", "4/21/2025", "4/22/2025", "4/23/2025"].map(d => [d, TrialsGrid.getRandomValidGrid(db, d).data]))
