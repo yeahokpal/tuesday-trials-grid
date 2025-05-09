@@ -17,13 +17,7 @@ function App() {
     initSqlJs({locateFile: () => sqlWasm })
       .then(SQL => fetch(dbFile)
         .then(db => db.arrayBuffer())
-        .then(bytes => {
-          let db = new SQL.Database(new Uint8Array(bytes));
-          setDb(db);
-          // console.debug(JSON.stringify(
-          //   Object.fromEntries(["4/20/2025", "4/21/2025", "4/22/2025", "4/23/2025"].map(d => [d, TrialsGrid.getRandomValidGrid(db, d).data]))
-          // ));
-    }));
+        .then(bytes => setDb(new SQL.Database(new Uint8Array(bytes)))));
   }, []);
 
   function setCustomData(customData: string | null) {

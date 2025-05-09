@@ -25,7 +25,7 @@ function getCustomGrid(db: Database, customData: string | null) {
 function Grid({db, customData}: {db: Database, customData: string | null}) {
   const [today] = useState(() => new Intl.DateTimeFormat("en-US").format(new Date()));
   // const [today] = useState(() => new Date().toISOString());
-  // const [today] = useState(() => "4/25/2025");
+  // const [today] = useState(() => "5/8/2025");
   const [players] = useState(() => db.exec("SELECT DISTINCT Name FROM Player ORDER BY Name")[0].values.flat().map(r => r!.toString()));
   const [selected, setSelected] = useState<number|null>(null);
   const [localData, setLocalData] = useLocalStorage<LocalData>("gameData", {});
@@ -40,6 +40,23 @@ function Grid({db, customData}: {db: Database, customData: string | null}) {
   const complete = guesses.every(c => c != null) || lives <= 0;
   const [alreadyComplete] = useState(complete);
   const [resultsVisible, setResultsVisible] = useState(false);
+
+  if (import.meta.env.DEV) {
+    useEffect(() => {
+      let dates = Object.keys(pastQueryData);
+      let date = new Date(dates[dates.length - 1]);
+      let printData = pastQueryData;
+      date.setDate(date.getDate() + 1);
+      while (date < new Date()) {
+        let dstr = new Intl.DateTimeFormat("en-US").format(date);
+        printData = {...printData, [dstr]: TrialsGrid.getRandomValidGrid(db, dstr).data};
+        date.setDate(date.getDate() + 1);
+      }
+      if (printData != pastQueryData) {
+        console.log(JSON.stringify(printData).replaceAll(/^{|],?/g,(a: string) => a+"\n"));
+      }
+    }, []);
+  }
 
   useEffect(() => {setCustomGameData(customData? new GameData() : undefined)}, [customData]);
   useEffect(() => setResultsVisible(statistics !== undefined), [statistics]);
