@@ -18,5 +18,43 @@
 "5/6/2025":[{"id":"miscdata","v":{"miscdata":"TRULY Esports"}},{"id":"game","v":{"game":"Under Night"}},{"id":"game","v":{"game":"Guilty Gear: Strive"}},{"id":"year","v":{"year":"2021"}},{"id":"year","v":{"year":"2024"}},{"id":"game","v":{"game":"Rivals 2"}}],
 "5/7/2025":[{"id":"game","v":{"game":"Ultimate"}},{"id":"game","v":{"game":"Ultra Fight Da! Kyanta 2"}},{"id":"game_place","v":{"game":"Mystery Game","placement":"8"}},{"id":"game_place","v":{"game":"Melty Blood: Type Lumina","placement":"3"}},{"id":"game","v":{"game":"KOFXV"}},{"id":"game","v":{"game":"Divekick"}}],
 "5/8/2025":[{"id":"stream","v":{}},{"id":"game_stream","v":{"stream_game":"Street Fighter 6"}},{"id":"game","v":{"game":"Guilty Gear XXAC+R"}},{"id":"game","v":{"game":"Persona 4 Arena Ultimax"}},{"id":"game","v":{"game":"Under Night"}},{"id":"character","v":{"game_char":"GGSTKy"}}],
-"5/9/2025":[{"id":"game","v":{"game":"Tekken 8"}},{"id":"avg_brackets","v":{}},{"id":"game","v":{"game":"Guilty Gear: Strive"}},{"id":"game","v":{"game":"Fantasy Strike"}},{"id":"game","v":{"game":"KOFXV"}},{"id":"controller","v":{"controller":"Pad"}}]
+"5/9/2025":[{"id":"game","v":{"game":"Tekken 8"}},{"id":"avg_brackets","v":{}},{"id":"game","v":{"game":"Guilty Gear: Strive"}},{"id":"game","v":{"game":"Fantasy Strike"}},{"id":"game","v":{"game":"KOFXV"}},{"id":"controller","v":{"controller":"Pad"}}],
+"5/10/2025":[{"id":"game","v":{"game":"Mystery Game"}},{"id":"game_stream","v":{"stream_game":"Virtua Fighter 5"}},{"id":"game","v":{"game":"Guilty Gear: Strive"}},{"id":"game_place","v":{"game":"Strive New Character Bracket","placement":"3"}},{"id":"game_stream","v":{"stream_game":"Fantasy Strike"}},{"id":"miscdata","v":{"miscdata":"NunchuckPup Tattoo"}}],
+"5/11/2025":[{"id":"game","v":{"game":"Dragon Ball FighterZ"}},{"id":"game_place","v":{"game":"Salty Suite (Strive)","placement":"8"}},{"id":"game","v":{"game":"Street Fighter 6"}},{"id":"game","v":{"game":"Mystery Game"}},{"id":"game_place","v":{"game":"Guilty Gear Xrd REV2","placement":"3"}},{"id":"game","v":{"game":"Under Night"}}],
+"5/12/2025":[{"id":"game","v":{"game":"Rivals 2"}},{"id":"nov_6","v":{}},{"id":"controller","v":{"controller":"Pad"}},{"id":"miscdata","v":{"miscdata":"NunchuckPup Tattoo"}},{"id":"game","v":{"game":"Granblue Fantasy Versus"}},{"id":"game","v":{"game":"Virtua Fighter 5"}}],
+"5/13/2025":[{"id":"game","v":{"game":"KOFXV"}},{"id":"stream","v":{}},{"id":"game","v":{"game":"Guilty Gear XXAC+R"}},{"id":"controller","v":{"controller":"Pad"}},{"id":"game_win","v":{"game":"Fantasy Strike"}},{"id":"game_place","v":{"game":"Vampire Savior","placement":"3"}}],
+"5/14/2025": [
+  {
+    "id": "controller",
+    "v": {
+      "controller": "Stick"
+    }
+  },
+  {
+    "id": "stream",
+    "v": {}
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Guilty Gear: Strive"
+    }
+  },
+  {
+    "id": "year",
+    "v": {
+      "year": "2021"
+    }
+  },
+  {
+    "id": "game",
+    "v": {
+      "game": "Tekken 8"
+    }
+  },
+  {
+    "id": "avg_brackets",
+    "v": {}
+  }
+]
 }
