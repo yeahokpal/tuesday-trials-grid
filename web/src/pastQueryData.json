@@ -23,38 +23,9 @@
 "5/11/2025":[{"id":"game","v":{"game":"Dragon Ball FighterZ"}},{"id":"game_place","v":{"game":"Salty Suite (Strive)","placement":"8"}},{"id":"game","v":{"game":"Street Fighter 6"}},{"id":"game","v":{"game":"Mystery Game"}},{"id":"game_place","v":{"game":"Guilty Gear Xrd REV2","placement":"3"}},{"id":"game","v":{"game":"Under Night"}}],
 "5/12/2025":[{"id":"game","v":{"game":"Rivals 2"}},{"id":"nov_6","v":{}},{"id":"controller","v":{"controller":"Pad"}},{"id":"miscdata","v":{"miscdata":"NunchuckPup Tattoo"}},{"id":"game","v":{"game":"Granblue Fantasy Versus"}},{"id":"game","v":{"game":"Virtua Fighter 5"}}],
 "5/13/2025":[{"id":"game","v":{"game":"KOFXV"}},{"id":"stream","v":{}},{"id":"game","v":{"game":"Guilty Gear XXAC+R"}},{"id":"controller","v":{"controller":"Pad"}},{"id":"game_win","v":{"game":"Fantasy Strike"}},{"id":"game_place","v":{"game":"Vampire Savior","placement":"3"}}],
-"5/14/2025": [
-  {
-    "id": "controller",
-    "v": {
-      "controller": "Stick"
-    }
-  },
-  {
-    "id": "stream",
-    "v": {}
-  },
-  {
-    "id": "game",
-    "v": {
-      "game": "Guilty Gear: Strive"
-    }
-  },
-  {
-    "id": "year",
-    "v": {
-      "year": "2021"
-    }
-  },
-  {
-    "id": "game",
-    "v": {
-      "game": "Tekken 8"
-    }
-  },
-  {
-    "id": "avg_brackets",
-    "v": {}
-  }
-]
+"5/14/2025":[{"id":"controller","v":{"controller":"Stick"}},{"id":"stream","v":{}},{"id":"game","v":{"game":"Guilty Gear: Strive"}},{"id":"year","v":{"year":"2021"}},{"id":"game","v":{"game":"Tekken 8"}},{"id":"avg_brackets","v":{}}],
+"5/15/2025":[{"id":"miscdata","v":{"miscdata":"TRULY Esports"}},{"id":"game","v":{"game":"Guilty Gear: Strive"}},{"id":"game","v":{"game":"Guilty Gear Xrd REV2"}},{"id":"game_stream","v":{"stream_game":"Fantasy Strike"}},{"id":"game_place","v":{"game":"SoulCalibur II","placement":"3"}},{"id":"game","v":{"game":"Melty Blood: Type Lumina"}}],
+"5/16/2025":[{"id":"game","v":{"game":"Guilty Gear XXAC+R"}},{"id":"wins","v":{"win_count":"10"}},{"id":"game_stream","v":{"stream_game":"Rivals 2"}},{"id":"controller","v":{"controller":"Stick"}},{"id":"place_2","v":{"placement_entrants":"1"}},{"id":"game","v":{"game":"Persona 4 Arena Ultimax"}}],
+"5/17/2025":[{"id":"game","v":{"game":"Tekken 8"}},{"id":"game","v":{"game":"Fantasy Strike"}},{"id":"year","v":{"year":"2023"}},{"id":"wins","v":{"win_count":"10"}},{"id":"game_win","v":{"game":"Under Night"}},{"id":"game_stream","v":{"stream_game":"Rivals 2"}}],
+"5/18/2025":[{"id":"game","v":{"game":"Mystery Game"}},{"id":"game_place","v":{"game":"Salty Suite (Strive)","placement":"8"}},{"id":"character","v":{"game_char":"SF6Akuma"}},{"id":"miscdata","v":{"miscdata":"TRULY Esports"}},{"id":"wins","v":{"win_count":"5"}},{"id":"year","v":{"year":"2024"}}]
 }
