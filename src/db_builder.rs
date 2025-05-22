@@ -101,6 +101,15 @@ pub async fn update_players<'a>(client: &Client, sql: &Connection) -> Result<(),
     Ok(())
 }
 
+pub async fn build_sheets_data() -> Result<(), Box<dyn Error>> {
+    let mut state = DbBuilderState {
+        client: Client::new(),
+        sql: Connection::open("./db.sqlite")?,
+        players: HashSet::new()
+    };
+    get_sheets_data(&state).await
+}
+
 async fn update_tournament(state: &mut DbBuilderState, tournament: Tournament, force_update: bool) -> Result<(), Box<dyn Error>>{
     let id = &tournament.id;
     let sql = &state.sql;
