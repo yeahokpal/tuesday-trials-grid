@@ -52,13 +52,13 @@ pub async fn build_db(force_update: bool) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-pub async fn build_last_trials() -> Result<(), Box<dyn Error>> {
+pub async fn build_last_trials(slug: Option<&str>) -> Result<(), Box<dyn Error>> {
     let mut state = DbBuilderState {
         client: Client::new(),
         sql: Connection::open("./db.sqlite")?,
         players: HashSet::new()
     };
-    let tournament = Tournament::try_from(make_request::<_, get_tournament::ResponseData>(&state.client, &GetTournament::build_query(get_tournament::Variables {slug: "trials".to_string()})).await?.data.expect("no data").tournament.expect("no data"))?;
+    let tournament = Tournament::try_from(make_request::<_, get_tournament::ResponseData>(&state.client, &GetTournament::build_query(get_tournament::Variables {slug: slug.unwrap_or("trials").to_string()})).await?.data.expect("no data").tournament.expect("no data"))?;
 
     update_tournament(&mut state, tournament, true).await?;
     update_players(&state.client, &state.sql).await?;
