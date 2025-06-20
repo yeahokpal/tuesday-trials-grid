@@ -1,6 +1,7 @@
 use std::{env, error::Error, fs, io::Write};
 
-use rusqlite::vtab::csvtab;
+use rusqlite::{types::{FromSql, FromSqlResult, Value}, vtab::csvtab};
+use serde::Serialize;
 
 use crate::db_builder::DbBuilderState;
 
@@ -12,23 +13,24 @@ pub async fn get_sheets_data(state: &DbBuilderState) -> Result<(), Box<dyn Error
         let data = state.client.get(format!("https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={urlify}"))
             .send().await?.bytes().await?;
         let db_name = sheet.replace(' ', "");
-        fs::File::create(format!("{db_name}.csv"))?.write(&data)?;
+        let mut f = fs::File::create(format!("{db_name}.csv"))?;
+        f.write(&data)?;
+        f.flush()?;
         
         state.sql.execute(format!("DROP TABLE IF EXISTS temp.{db_name}").as_str(), [])?;
         state.sql.execute(format!("CREATE VIRTUAL TABLE temp.{db_name} USING csv(filename='{db_name}.csv', header=TRUE)").as_str(), [])?;
     }
 
     for stmt in vec![
-    "UPDATE Event
-    SET Name = dedup.[Rename To]
-    FROM temp.GameDeduplication dedup
-    WHERE Event.Name = dedup.Name
-    AND dedup.[Rename To] > ''",
-
-    "DELETE FROM Event WHERE Name IN (SELECT Name FROM temp.GameDeduplication WHERE [Delete] = 'Y')",
-
+    "DELETE FROM EventRename",
+    "INSERT INTO EventRename
+    SELECT Name, [Rename To], [Delete]
+    FROM temp.GameDeduplication
+    ",
+    "UPDATE EventRename SET [Rename To] = Name WHERE [Rename To] = ''",
+    "UPDATE Player SET DisplayName = Name",
     "UPDATE Player
-    SET Name = playerdat.[Rename To]
+    SET DisplayName = playerdat.[Rename To]
     FROM temp.PlayerData playerdat
     WHERE Player.ID = playerdat.ID AND playerdat.[Rename To] > ''",
 
@@ -94,6 +96,57 @@ pub async fn get_sheets_data(state: &DbBuilderState) -> Result<(), Box<dyn Error
     ").as_str(), ())?;
 
     state.sql.cache_flush()?;
+    {
+        let mut file = fs::OpenOptions::new()
+            .append(true)
+            .open("PlayerData.csv")?;
+        file.write(&[b'\n'])?;
+        let mut csv = csv::Writer::from_writer(file);
+        let mut stmt = state.sql.prepare("
+        SELECT p.ID, p.Name, (SELECT COUNT(*) FROM Standing WHERE PlayerID = p.ID) AS Count
+        FROM Player p
+        LEFT JOIN temp.PlayerData pd ON pd.ID = p.ID
+        WHERE pd.ID IS NULL")?;
+        let count = stmt.column_count();
+        let mut rows = stmt.query([])?;
+        while let Some(item) = rows.next()? {
+            csv.write_record((0..count).map(|i|match item.get::<_, Value>(i).unwrap()
+            {
+                Value::Null => "".to_string(),
+                Value::Integer(i) => i.to_string(),
+                Value::Real(i) => i.to_string(),
+                Value::Text(s) => s,
+                Value::Blob(_) => "".to_string(),
+            }))?;
+        }
+        csv.flush()?;
+    }
+    {
+        let mut file = fs::OpenOptions::new()
+            .append(true)
+            .open("GameDeduplication.csv")?;
+        file.write(&[b'\n'])?;
+        let mut csv = csv::Writer::from_writer(file);
+        let mut stmt = state.sql.prepare("
+        SELECT e.Name, COUNT(*) AS Count, '' [Rename To], 'New' [Delete]
+        FROM Event e
+        LEFT JOIN temp.GameDeduplication g ON g.Name = e.Name
+        WHERE g.Name IS NULL
+        GROUP BY e.Name")?;
+        let count = stmt.column_count();
+        let mut rows = stmt.query([])?;
+        while let Some(item) = rows.next()? {
+            csv.write_record((0..count).map(|i|match item.get::<_, Value>(i).unwrap()
+            {
+                Value::Null => "".to_string(),
+                Value::Integer(i) => i.to_string(),
+                Value::Real(i) => i.to_string(),
+                Value::Text(s) => s,
+                Value::Blob(_) => "".to_string(),
+            }))?;
+        }
+        csv.flush()?;
+    }
 
     Ok(())
 }

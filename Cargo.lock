@@ -7,6 +7,7 @@ name = "TuesdayTrialsGrid"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "csv",
  "dotenv",
  "futures",
  "graphql_client",

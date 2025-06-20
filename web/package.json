@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build --base=/tuesday-trials-grid/",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -34,6 +35,7 @@
     "typescript-eslint": "^8.26.1",
     "typescript-plugin-toml": "^0.5.0",
     "vite": "^6.3.1",
-    "vite-plugin-toml": "^0.7.0"
+    "vite-plugin-toml": "^0.7.0",
+    "vitest": "^3.2.4"
   }
 }

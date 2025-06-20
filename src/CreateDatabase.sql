@@ -6,9 +6,15 @@ CREATE TABLE IF NOT EXISTS "Event" (
 	PRIMARY KEY("ID"),
 	FOREIGN KEY("TournamentID") REFERENCES "Tournament"("ID") ON DELETE CASCADE
 );
+CREATE TABLE IF NOT EXISTS "EventRename" (
+	"Name" TEXT NOT NULL,
+	"Rename To" TEXT,
+	"Delete" TEXT
+);
 CREATE TABLE IF NOT EXISTS "Player" (
 	"ID"	INTEGER NOT NULL UNIQUE,
 	"Name"	TEXT NOT NULL,
+	"DisplayName" TEXT,
 	"ProfileUrl"	TEXT,
 	"Main"	INTEGER,
 	PRIMARY KEY("ID")
@@ -37,5 +43,20 @@ CREATE TABLE IF NOT EXISTS "Tournament" (
 	"Name"	TEXT NOT NULL,
 	"StartAt" BIGINT NOT NULL,
 	PRIMARY KEY("ID")
+);
+CREATE TABLE IF NOT EXISTS "Stream" (
+  Title TEXT,
+  Game TEXT,
+  player1 TEXT,
+  player2 TEXT
+);
+CREATE TABLE IF NOT EXISTS "Controller" (
+	"ID"	INTEGER,
+	"Controller"	TEXT
+);
+CREATE TABLE IF NOT EXISTS "Character" (
+	"ID"	INTEGER NOT NULL,
+	"Game"	TEXT NOT NULL,
+	"Character"	TEXT NOT NULL
 );
 COMMIT;

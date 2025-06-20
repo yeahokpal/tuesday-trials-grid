@@ -61,8 +61,8 @@ pub async fn build_last_trials(slug: Option<&str>) -> Result<(), Box<dyn Error>>
     let tournament = Tournament::try_from(make_request::<_, get_tournament::ResponseData>(&state.client, &GetTournament::build_query(get_tournament::Variables {slug: slug.unwrap_or("trials").to_string()})).await?.data.expect("no data").tournament.expect("no data"))?;
 
     update_tournament(&mut state, tournament, true).await?;
-    update_players(&state.client, &state.sql).await?;
     get_sheets_data(&state).await?;
+    // update_players(&state.client, &state.sql).await?;
 
     Ok(())
 }
@@ -71,7 +71,7 @@ pub async fn build_last_trials(slug: Option<&str>) -> Result<(), Box<dyn Error>>
 pub async fn update_players<'a>(client: &Client, sql: &Connection) -> Result<(), Box<dyn Error>> {
     let mut stmt = sql.prepare("
     select * 
-    from (select *, row_number() over (partition by p.name order by (select count(*) from standing where playerid = p.id) desc) rnk FROM Player p) r
+    from (select *, row_number() over (partition by p.DisplayName order by (select count(*) from standing where playerid = p.id) desc) rnk FROM Player p) r
     JOIN Player p ON p.id = r.id
     where rnk = 1 AND p.Main IS NULL")?;
     for res in stmt.query_map((), |res| res.get("ID").and_then(|i|Ok(i32::to_string(&i))))? {
@@ -93,9 +93,9 @@ pub async fn update_players<'a>(client: &Client, sql: &Connection) -> Result<(),
         }
     }
 
-    sql.execute("UPDATE Player SET Main = 1
-    FROM (select *, row_number() over (partition by p.name order by (select count(*) from standing where playerid = p.id) desc) rnk FROM Player p) r
-    where r.id = Player.id AND r.rnk = 1 AND Player.Main IS NULL
+    sql.execute("UPDATE Player SET Main = IIF(r.rnk = 1, 1, NULL)
+    FROM (select *, row_number() over (partition by p.DisplayName order by (select count(*) from standing where playerid = p.id) desc) rnk FROM Player p) r
+    where r.id = Player.id
     ", ())?;
 
     Ok(())
@@ -134,7 +134,7 @@ async fn update_tournament(state: &mut DbBuilderState, tournament: Tournament, f
     for participant in participants.into_iter().filter_map(|x| x) {
         let pid = participant.player.as_ref().and_then(|p| p.id.clone()).expect("Missing id");
         if !state.players.contains(&pid) {
-            sql.execute("INSERT INTO Player(ID, Name) VALUES (?1, ?2) ON CONFLICT DO NOTHING", (&pid, participant.player.as_ref().and_then(|p|p.gamer_tag.as_ref()).expect("Missing id")))
+            sql.execute("INSERT INTO Player(ID, Name) VALUES (?1, ?2) ON CONFLICT DO UPDATE SET Name = excluded.Name", (&pid, participant.player.as_ref().and_then(|p|p.gamer_tag.as_ref()).expect("Missing id")))
             .expect("Player insert");
             state.players.insert(pid.clone());
         }

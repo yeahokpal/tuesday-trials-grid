@@ -21,13 +21,6 @@ const cyrb53 = (str: string, seed : number = 0) => {
     return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 };
 
-function initValues(sql: Database, v: Var) {
-    if (!v.values && !v.strValues) {
-        let res = sql.exec(v.query!)[0];
-        if (res.columns.length === 1) v.strValues = res.values.flat().map(r => r!.toString());
-        else v.values = res.values.map(r => Object.fromEntries(r.map((v, i) => [res.columns[i], res.columns[i] === 'odds'? v?.valueOf() as number : v!.toString()]))) as VarValue[];
-    }
-}
 class TrialsGrid {
     rows: (Query | undefined)[];
     columns: (Query | undefined)[];
@@ -37,7 +30,7 @@ class TrialsGrid {
     valid: boolean;
 
     public constructor(sql: Database, data: QueryData[], shortCircuit: boolean) {
-        Object.values(queryFile.vars).forEach(v => initValues(sql, v));
+        Object.values(queryFile.vars).forEach(v => TrialsGrid.initValues(sql, v));
         this.sql = sql;
         this.data = data;
         let loaded = data.map(d => d? toQuery(queryFile, d) : undefined);
@@ -68,6 +61,13 @@ class TrialsGrid {
         this.columns[i] = toQuery(queryFile, data);
         this.calcAnswers(false, {columns: [i]});
         this.valid = this.verifyGrid();
+    }
+    static initValues(sql: Database, v: Var) {
+        if (!v.values && !v.strValues) {
+            let res = sql.exec(v.query!)[0];
+            if (res.columns.length === 1) v.strValues = res.values.flat().map(r => r!.toString());
+            else v.values = res.values.map(r => Object.fromEntries(r.map((v, i) => [res.columns[i], res.columns[i] === 'odds'? v?.valueOf() as number : v!.toString()]))) as VarValue[];
+        }
     }
 
     static getRandomQueries(rand: RandomGenerator, limit: number) {
@@ -117,7 +117,7 @@ class TrialsGrid {
     }
 
     static getRandomValidGrid(sql: Database, seed: string): TrialsGrid {
-        Object.values(queryFile.vars).forEach(v => initValues(sql, v));
+        Object.values(queryFile.vars).forEach(v => TrialsGrid.initValues(sql, v));
         let rand = prand.xoroshiro128plus(cyrb53(seed));
         let badqueries = 0;
         let grid;

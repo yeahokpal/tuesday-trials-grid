@@ -21,9 +21,9 @@ async fn main() -> rusqlite::Result<()> {
     // dbg!(&vec);
 
     // match update_players(&client, &sql, &mut vec.iter()).await {
-    match build_last_trials(Some("trials190")).await {
+    // match build_last_trials(Some("trials")).await {
     // match build_db(false).await {
-    // match build_sheets_data().await {
+    match build_sheets_data().await {
         Err(e)=>{dbg!(&e);},
         Ok(_) => {print!("success\n");}
     };

@@ -13,7 +13,7 @@ export function queryDataEquals(a: QueryData, b: QueryData) {
     if (ak.length != bk.length) return false;
     return ak.every(k => a.v[k] === b.v[k]);
 }
-export function toQuery(queryFile: QueryFile, d: QueryData) {
+export function toQuery(queryFile: QueryFile, d: QueryData): Query | undefined {
     let q = queryFile.queries[d.id];
     if (!q) return;
 
