@@ -35,3 +35,6 @@ describe("queries", () =>
         });
     }
 });
+test("3+ games", () => {
+    console.log(sql.exec("select p.DisplayName, count(*) * 1.0 / count(distinct tournamentid) from Player p join Standing s on s.playerid = p.id join event e on s.eventid = e.id group by p.DisplayName order by 2 desc")[0].values);
+})
