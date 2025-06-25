@@ -37,14 +37,14 @@ pub async fn get_sheets_data(state: &DbBuilderState) -> Result<(), Box<dyn Error
     "DELETE FROM Stream",
     "INSERT INTO Stream
     SELECT DISTINCT Title, COALESCE(sr.[Rename To], sd.Game) AS Game
-    , COALESCE(sp1.[Rename To], p1.[Rename To], sd.player1) AS Player1
-    , COALESCE(sp2.[Rename To], p2.[Rename To], sd.player2) AS Player2
+    , COALESCE(p1.DisplayName, sd.player1) AS Player1
+    , COALESCE(p2.DisplayName, sd.player2) AS Player2
     FROM temp.StreamData sd
     LEFT JOIN temp.StreamRename sr ON sd.Game = sr.Game AND sr.[Rename To] > ''
-    LEFT JOIN temp.StreamPlayerRename sp1 ON sp1.Name = sd.Player1 AND sp1.[Rename To] > ''
-    LEFT JOIN temp.StreamPlayerRename sp2 ON sp2.Name = sd.Player2 AND sp2.[Rename To] > ''
-    LEFT JOIN temp.PlayerData p1 ON p1.Name = sd.player1 AND p1.[Rename To] > ''
-    LEFT JOIN temp.PlayerData p2 ON p2.Name = sd.player2 AND p2.[Rename To] > ''
+    LEFT JOIN temp.StreamPlayerRename sp1 ON sp1.Name = sd.Player1
+    LEFT JOIN temp.StreamPlayerRename sp2 ON sp2.Name = sd.Player2
+    LEFT JOIN Player p1 ON p1.ID = sp1.ID
+    LEFT JOIN Player p2 ON p2.ID = sp2.ID
     WHERE sd.Game > ''",
 
     "DELETE FROM Controller",

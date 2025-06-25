@@ -45,6 +45,16 @@ GROUP BY Game, Character
 HAVING COUNT(*) > 5
 """
 
+[vars.first_letter]
+query = """
+with letters(letter) as (values ('A'),('B'),('C'),('D'),('E'),('F'),('G'),('H'),('I'),('J'),('K'),('L'),('M'),('N'),('O'),('P'),('Q'),('R'),('S'),('T'),('U'),('V'),('W'),('X'),('Y'),('Z'))
+select letter as id, count(*) as odds
+from letters
+join (select distinct DisplayName from Player) p
+on substr(p.DisplayName, 1, 1) LIKE letter
+group by letter
+"""
+
 
 [queries.game]
 label = "[game]"
@@ -85,6 +95,15 @@ select distinct p.DisplayName
 from Player p
 JOIN Character c ON p.id = c.id
 WHERE c.Game = '[game_char.game]' AND c.Character = "[game_char.character]"
+"""
+odds = 75
+
+[queries.first_letter]
+label = "Starts with [first_letter]"
+query = """
+select distinct DisplayName
+from Player
+where substr(DisplayName, 1, 1) LIKE '[first_letter]'
 """
 odds = 75
 
@@ -161,6 +180,15 @@ query = """
 select distinct name
 from (select player1 as name, game from Stream union select player2, game from Stream) s
 where s.game = "[stream_game]"
+"""
+odds = 50
+
+[queries.num_in_name]
+label = "Name contains a number"
+query = """
+;with nums(num) as (values (0),(1),(2),(3),(4),(5),(6),(7),(8),(9))
+select distinct DisplayName from player 
+join nums on instr(DisplayName, num)
 """
 odds = 50
 
