@@ -132,10 +132,11 @@ async fn update_tournament(state: &mut DbBuilderState, tournament: Tournament, f
         .expect("participants query");
     
     for participant in participants.into_iter().filter_map(|x| x) {
-        let pid = participant.player.as_ref().and_then(|p| p.id.clone()).expect("Missing id");
-        if !state.players.contains(&pid) {
-            sql.execute("INSERT INTO Player(ID, Name) VALUES (?1, ?2) ON CONFLICT DO UPDATE SET Name = excluded.Name", (&pid, participant.player.as_ref().and_then(|p|p.gamer_tag.as_ref()).expect("Missing id")))
-            .expect("Player insert");
+        let pid = participant.player.as_ref().and_then(|p| p.id.as_ref()).expect("Missing id");
+        if !state.players.contains(pid) {
+            let name = participant.player.as_ref().and_then(|p|p.gamer_tag.as_ref()).expect("Missing name");
+            sql.execute("INSERT INTO Player(ID, Name) VALUES (?1, ?2) ON CONFLICT DO UPDATE SET Name = excluded.Name", (pid, name))
+                .expect("Player insert");
             state.players.insert(pid.clone());
         }
         for entrant in participant.entrants.into_iter().flatten().filter_map(|x| x) {

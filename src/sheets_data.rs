@@ -96,6 +96,17 @@ pub async fn get_sheets_data(state: &DbBuilderState) -> Result<(), Box<dyn Error
     ").as_str(), ())?;
 
     state.sql.cache_flush()?;
+
+    {
+        let mut stmt = state.sql.prepare("
+        SELECT p.Name, pd.Name
+        FROM Player p
+        JOIN temp.PlayerData pd ON pd.ID = p.ID AND pd.Name != p.Name AND pd.[Rename To] = ''")?;
+        let mut rows = stmt.query([])?;
+        while let Some(item) = rows.next()? {
+            dbg!(item.get::<_, String>(0)?, item.get::<_, String>(1)?);
+        }
+    }
     {
         let mut file = fs::OpenOptions::new()
             .append(true)
