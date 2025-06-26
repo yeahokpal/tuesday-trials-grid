@@ -5,7 +5,7 @@ function SearchBar({choices, choose, options, visible, hide}:
         {
             choices: string[],
             choose: (choice: string) => boolean | undefined, 
-            options: string[],
+            options: {name: string, displayName: string}[],
             visible: boolean,
             hide: () => void,
         }) {
@@ -19,8 +19,8 @@ function SearchBar({choices, choose, options, visible, hide}:
                 onKeyDown={e => e.key === "Escape" && hide()}
                 autoFocus/>
             {/^\s*$/.test(input)? <></> :
-                options.filter(o => (o.toLowerCase().includes(input.toLowerCase())))
-                    .map(o => <SearchOption key={o} value={o} choose={choices.includes(o)? undefined : choose}/>)
+                options.filter(o => (o.displayName.toLowerCase().includes(input.toLowerCase())))
+                    .map(o => <SearchOption key={o.displayName} value={o} choose={choices.includes(o.displayName)? undefined : choose}/>)
             }
         </div>
     </div>

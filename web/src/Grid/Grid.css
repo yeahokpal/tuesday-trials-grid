@@ -47,6 +47,12 @@
 .smaller .gridLabel {
     font-size: min(1.3rem, 1.75vw);
 }
+.gridSubLabel {
+    text-align: center;
+    font-size: min(1rem, 2vw);
+    margin-top: 0;
+    margin-bottom: 0;
+}
 @media (max-width: 1200px) {
     .grid {
         display: grid;
