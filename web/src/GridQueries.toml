@@ -191,7 +191,7 @@ select distinct DisplayName
 from (values (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) nums
 join player p on instr(DisplayName, column1) > 0
 	or instr(Name, column1) > 0
-	or DisplayName IN ('Juushichi', 'Ichi')
+	or DisplayName IN ('Juushichi', 'Ichi', 'fourside')
 	or Name IN ('Meaty Behemy II: Meatier')
 """
 odds = 50
@@ -230,14 +230,14 @@ HAVING AVG(r.duration) [gtlt] 600
 odds = 10
 
 [queries.set_win_pct]
-label = "Lifetime set win % [gtlt.label] 50% (min 10 games played)"
+label = "Lifetime set win % [gtlt.label] 50%"
 query = """
 select DisplayName
 from Player
 join (select winnerID, count(*) as count from SetResult where loserScore > -1 group by winnerID) w on w.winnerID = Player.ID
 join (select loserID, count(*) as count from SetResult where loserScore > -1 group by loserID) l on l.loserID = Player.ID
 group by DisplayName
-having SUM(w.count) > 10 AND SUM(w.count) * 1.0 / (SUM(w.count) + SUM(l.count)) [gtlt] 0.5
+having SUM(w.count) * 1.0 / (SUM(w.count) + SUM(l.count)) [gtlt] 0.5
 """
 odds = 10
 
