@@ -10,6 +10,7 @@ query GetParticipants($id: ID!, $page: Int!, $pageSize: Int!) {
                 player {
                     id
                     gamerTag
+                    prefix
                 }
                 entrants {
                     id

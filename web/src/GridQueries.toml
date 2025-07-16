@@ -196,6 +196,15 @@ join player p on instr(DisplayName, column1) > 0
 """
 odds = 50
 
+[queries.has_prefix]
+label = "Has a prefix (aka sponsor tag) set on start.gg"
+query = """
+select distinct DisplayName
+from Player
+where Prefix > '' and Main = 1
+"""
+odds = 50
+
 [queries.nickname]
 label = "Startgg name does not match grid search name"
 query = """

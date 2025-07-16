@@ -73,20 +73,21 @@ pub async fn update_players<'a>(client: &Client, sql: &Connection) -> Result<(),
     select * 
     from (select *, row_number() over (partition by p.DisplayName order by (select count(*) from standing where playerid = p.id) desc) rnk FROM Player p) r
     JOIN Player p ON p.id = r.id
-    where rnk = 1 AND p.Main IS NULL")?;
+    where rnk = 1 AND Main IS NULL")?;
     for res in stmt.query_map((), |res| res.get("ID").and_then(|i|Ok(i32::to_string(&i))))? {
         match res {
         Ok(id) => {
             dbg!(&id);
             sleep(Duration::from_millis(1000)).await;
             let res = make_request::<_, get_player::ResponseData>(client, &GetPlayer::build_query(get_player::Variables{id: id.clone()})).await?;
-            if let Some(url) = res.data.and_then(|d|d.player)
-                .and_then(|p|p.user)
+            if let Some(p) = res.data.and_then(|d|d.player) {
+            if let Some(url) = p.user
                 .and_then(|u|u.images)
                 .into_iter().flatten().collect::<Option<Vec<_>>>()
                 .and_then(|images|images.get(0)?.url.clone())
             {
-                sql.execute("UPDATE Player Set ProfileUrl = ?1 WHERE ID = ?2", (url, id))?;
+                sql.execute("UPDATE Player Set ProfileUrl = ?1, Prefix = ?2 WHERE ID = ?3", (url, p.prefix, id))?;
+            }
             }
         }
         Err(e) => {return Err(e.into())}
@@ -132,10 +133,11 @@ async fn update_tournament(state: &mut DbBuilderState, tournament: Tournament, f
         .expect("participants query");
     
     for participant in participants.into_iter().filter_map(|x| x) {
-        let pid = participant.player.as_ref().and_then(|p| p.id.as_ref()).expect("Missing id");
-        if !state.players.contains(pid) {
-            let name = participant.player.as_ref().and_then(|p|p.gamer_tag.as_ref()).expect("Missing name");
-            sql.execute("INSERT INTO Player(ID, Name) VALUES (?1, ?2) ON CONFLICT DO UPDATE SET Name = excluded.Name", (pid, name))
+        if let Some(player) = participant.player {
+        if let Some(pid) = player.id {
+        if !state.players.contains(&pid) {
+            let name = player.gamer_tag.expect("Missing name");
+            sql.execute("INSERT INTO Player(ID, Name, Prefix) VALUES (?1, ?2, ?3) ON CONFLICT DO UPDATE SET Name = excluded.Name, Prefix = excluded.Prefix", (&pid, name, player.prefix))
                 .expect("Player insert");
             state.players.insert(pid.clone());
         }
@@ -149,6 +151,8 @@ async fn update_tournament(state: &mut DbBuilderState, tournament: Tournament, f
                     )).expect("Standing insert");
 
             }
+        }
+        }
         }
     }
     let arr : Vec<String> = tournament.events.iter().flatten().map(|e| e.id.clone()).collect();
