@@ -106,7 +106,7 @@ from Player
 where substr(DisplayName, 1, 1) LIKE '[first_letter]'
 or substr(Name, 1, 1) LIKE '[first_letter]'
 """
-odds = 75
+odds = 100
 
 [queries.controller]
 label = "[controller]"
@@ -236,6 +236,17 @@ having count(profileurl) = 0
 """
 odds = 25
 
+[queries.disloyal]
+label = "Disloyal to their org"
+query = """
+select distinct DisplayName from MiscData m
+join player p on p.id = m.id
+where (m.[TRULY Esports] = 'Y' and (p.Prefix IS NULL OR p.Prefix NOT LIKE '%TRULY%'))
+OR (m.[Quiznos Esports] = 'Y' and (p.Prefix IS NULL OR p.Prefix NOT LIKE '%QUIZNOS%'))
+OR (m.[SCUM Esports] = 'Y' and (p.Prefix IS NULL OR p.Prefix NOT LIKE '%SCUM%'))
+"""
+odds = 30
+
 [queries.set_len]
 label = "Average set length [gtlt.label] 10 minutes"
 query = """
@@ -246,7 +257,7 @@ WHERE r.loserScore > -1 AND r.duration BETWEEN 120 AND 1200
 GROUP BY DisplayName
 HAVING AVG(r.duration) [gtlt] 600
 """
-odds = 10
+odds = 5
 
 [queries.set_win_pct]
 label = "Lifetime set win % [gtlt.label] 50%"
@@ -258,7 +269,7 @@ join (select loserID, count(*) as count from SetResult where loserScore > -1 gro
 group by DisplayName
 having SUM(w.count) * 1.0 / (SUM(w.count) + SUM(l.count)) [gtlt] 0.5
 """
-odds = 10
+odds = 5
 
 [queries.nov_6]
 label = "November 6th birthday"

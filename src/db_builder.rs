@@ -73,7 +73,7 @@ pub async fn update_players<'a>(client: &Client, sql: &Connection) -> Result<(),
     select * 
     from (select *, row_number() over (partition by p.DisplayName order by (select count(*) from standing where playerid = p.id) desc) rnk FROM Player p) r
     JOIN Player p ON p.id = r.id
-    where rnk = 1 AND Main IS NULL")?;
+    where rnk = 1 AND p.Main IS NULL")?;
     for res in stmt.query_map((), |res| res.get("ID").and_then(|i|Ok(i32::to_string(&i))))? {
         match res {
         Ok(id) => {
@@ -81,13 +81,11 @@ pub async fn update_players<'a>(client: &Client, sql: &Connection) -> Result<(),
             sleep(Duration::from_millis(1000)).await;
             let res = make_request::<_, get_player::ResponseData>(client, &GetPlayer::build_query(get_player::Variables{id: id.clone()})).await?;
             if let Some(p) = res.data.and_then(|d|d.player) {
-            if let Some(url) = p.user
-                .and_then(|u|u.images)
-                .into_iter().flatten().collect::<Option<Vec<_>>>()
-                .and_then(|images|images.get(0)?.url.clone())
-            {
+                let url = p.user
+                    .and_then(|u|u.images)
+                    .into_iter().flatten().collect::<Option<Vec<_>>>()
+                    .and_then(|images|images.get(0)?.url.clone());
                 sql.execute("UPDATE Player Set ProfileUrl = ?1, Prefix = ?2 WHERE ID = ?3", (url, p.prefix, id))?;
-            }
             }
         }
         Err(e) => {return Err(e.into())}
