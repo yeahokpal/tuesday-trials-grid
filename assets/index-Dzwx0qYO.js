@@ -78,7 +78,7 @@ JOIN Standing s ON s.EventID = e.ID
 JOIN Player p ON p.ID = s.PlayerID
 JOIN EventRename er ON er.Name = e.Name
 WHERE er.[Rename To] = "[game]" AND s.Standing <= [placement]
-`,odds:125},miscdata:{label:"[miscdata]",query:`select distinct p.DisplayName
+`,odds:120},miscdata:{label:"[miscdata]",query:`select distinct p.DisplayName
 from Player p
 join MiscData m ON m.id = p.id AND m."[miscdata]" = 'Y'
 `,odds:100},character:{label:"[game_char.character] ([game_char.game])",query:`select distinct p.DisplayName
