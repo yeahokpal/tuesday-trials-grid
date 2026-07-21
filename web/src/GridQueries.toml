@@ -2,7 +2,7 @@
 # query = "SELECT Name FROM Event"
 query = """
 select [Rename To] as id, 
-	case when [Rename To] in ("Love Live: Sunshine Showdown", "Fantasy Strike") then 30 
+	case when [Rename To] in ("Love Live: Sunshine Showdown", "Fantasy Strike") then 20 
 	else 
 	MIN((SELECT COUNT(*) FROM Event e WHERE e.Name = er.Name), 70)
 	end AS odds
@@ -82,7 +82,7 @@ JOIN Player p ON p.ID = s.PlayerID
 JOIN EventRename er ON er.Name = e.Name
 WHERE er.[Rename To] = "[game]" AND s.Standing <= [placement]
 """
-odds = 120
+odds = 130
 
 [queries.miscdata]
 label = "[miscdata]"
@@ -250,7 +250,7 @@ where (m.[TRULY Esports] = 'Y' and (p.Prefix IS NULL OR p.Prefix NOT LIKE '%TRUL
 OR (m.[Quiznos Esports] = 'Y' and (p.Prefix IS NULL OR p.Prefix NOT LIKE '%QUIZNOS%'))
 OR (m.[SCUM Esports] = 'Y' and (p.Prefix IS NULL OR p.Prefix NOT LIKE '%SCUM%'))
 """
-odds = 5
+odds = 1
 
 [queries.set_len]
 label = "Average set length [gtlt.label] 10 minutes"
