@@ -82,7 +82,7 @@ JOIN Player p ON p.ID = s.PlayerID
 JOIN EventRename er ON er.Name = e.Name
 WHERE er.[Rename To] = "[game]" AND s.Standing <= [placement]
 """
-odds = 125
+odds = 120
 
 [queries.miscdata]
 label = "[miscdata]"
