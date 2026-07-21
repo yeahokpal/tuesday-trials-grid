@@ -73,7 +73,8 @@ pub async fn update_players<'a>(client: &Client, sql: &Connection) -> Result<(),
     select * 
     from (select *, row_number() over (partition by p.DisplayName order by (select count(*) from standing where playerid = p.id) desc) rnk FROM Player p) r
     JOIN Player p ON p.id = r.id
-    where rnk = 1 AND p.Main IS NULL")?;
+    where rnk = 1 --AND p.Main IS NULL
+")?;
     for res in stmt.query_map((), |res| res.get("ID").and_then(|i|Ok(i32::to_string(&i))))? {
         match res {
         Ok(id) => {

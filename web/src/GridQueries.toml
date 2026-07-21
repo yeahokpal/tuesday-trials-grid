@@ -1,7 +1,11 @@
 [vars.game]
 # query = "SELECT Name FROM Event"
 query = """
-select [Rename To] as id, MIN((SELECT COUNT(*) FROM Event e WHERE e.Name = er.Name), 30) AS odds
+select [Rename To] as id, 
+	case when [Rename To] in ("Love Live: Sunshine Showdown", "Fantasy Strike") then 30 
+	else 
+	MIN((SELECT COUNT(*) FROM Event e WHERE e.Name = er.Name), 70)
+	end AS odds
 FROM EventRename er
 WHERE [Delete] = ''
 AND EXISTS (SELECT * FROM SetResult s JOIN Event e ON e.ID = s.EventID WHERE e.Name = er.Name)
@@ -35,12 +39,13 @@ query = "SELECT name FROM pragma_table_info('MiscData') WHERE name != 'ID'"
 values = [{id = ">", label = "above"}, {id = "<", label = "below"}]
 
 [vars.controller]
-query = "SELECT DISTINCT Controller FROM Controller"
+query = "SELECT DISTINCT Controller FROM Controller WHERE Controller != '?'"
 
 [vars.game_char]
 query = """
 SELECT concat(Game, Character) AS id, Game as game, Character as character
 FROM Character
+WHERE Character != '?'
 GROUP BY Game, Character
 HAVING COUNT(*) > 5
 """
@@ -182,7 +187,7 @@ select distinct name
 from (select player1 as name, game from Stream union select player2, game from Stream) s
 where s.game = "[stream_game]"
 """
-odds = 50
+odds = 70
 
 [queries.num_in_name]
 label = "Name contains a number"
@@ -210,7 +215,7 @@ label = "Startgg name does not match grid search name"
 query = """
 select DisplayName from PLayer where DisplayName != Name and main = 1
 """
-odds = 25
+odds = 5
 
 [queries.place_2]
 label = "[placement_entrants.label] 2 games in the same event [placement_entrants.entrantsLabel]"
@@ -234,7 +239,7 @@ from Player
 group by DisplayName
 having count(profileurl) = 0
 """
-odds = 25
+odds = 15
 
 [queries.disloyal]
 label = "Disloyal to their org"
@@ -245,7 +250,7 @@ where (m.[TRULY Esports] = 'Y' and (p.Prefix IS NULL OR p.Prefix NOT LIKE '%TRUL
 OR (m.[Quiznos Esports] = 'Y' and (p.Prefix IS NULL OR p.Prefix NOT LIKE '%QUIZNOS%'))
 OR (m.[SCUM Esports] = 'Y' and (p.Prefix IS NULL OR p.Prefix NOT LIKE '%SCUM%'))
 """
-odds = 30
+odds = 5
 
 [queries.set_len]
 label = "Average set length [gtlt.label] 10 minutes"

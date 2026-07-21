@@ -23,7 +23,14 @@ function getCustomGrid(db: Database, customData: string | null) {
   }
 }
 function Grid({db, customData}: {db: Database, customData: string | null}) {
-  const [today] = useState(() => new Intl.DateTimeFormat("en-US").format(new Date()));
+  const eventId = 'tt250';
+  const [eventData, setEventData] = useState<EventData|null>(null);
+  const [today] = useState(() =>
+    {
+      let date = new Intl.DateTimeFormat("en-US").format(new Date());
+      return eventId? eventId + '-' + date + '-' + new Date().getHours()
+        : date;
+    });
   // const [today] = useState(() => new Date().toISOString());
   // const [today] = useState(() => "6/25/2025");
   const [players] = useState(() => db.exec("SELECT DISTINCT Name, DisplayName FROM Player WHERE Main = 1 ORDER BY DisplayName")[0].values.map(r => ({name: r[0]!.toString(), displayName: r[1]!.toString()})));
@@ -41,7 +48,7 @@ function Grid({db, customData}: {db: Database, customData: string | null}) {
   const [alreadyComplete] = useState(complete);
   const [resultsVisible, setResultsVisible] = useState(false);
 
-  if (import.meta.env.DEV) {
+  if (false && import.meta.env.DEV) {
     useEffect(() => {
       let dates = Object.keys(pastQueryData);
       let date = new Date(dates[dates.length - 1]);
@@ -61,6 +68,13 @@ function Grid({db, customData}: {db: Database, customData: string | null}) {
   useEffect(() => {setCustomGameData(customData? new GameData() : undefined)}, [customData]);
   useEffect(() => setResultsVisible(statistics !== undefined), [statistics]);
   useEffect(() => {selected && complete && setSelected(null)}, [selected && complete]);
+  useEffect(() => {
+    if (eventId) fetch("https://trials-grid-716349156143.us-central1.run.app/event?" +
+      new URLSearchParams({eventId}), {
+          method: "GET",
+          mode: "cors"
+        }).then(res => res.json()).then(json => setEventData(json));
+  }, [eventId]);
   useEffect(() => {
     if (!customData && !statistics) {
       if (alreadyComplete) {
@@ -133,6 +147,7 @@ ${[0, 1, 2].map(i => guesses.slice(i * 3, i * 3 + 3))
 
 
   return <>
+    {eventData && <p>{eventData.name}</p>}
     <div className={classNames("grid", {"complete": complete})}>
       {grid.columns.map((c, i) => <div key={i} style={{gridColumn: i + 2}}><Label text={c!.label}/></div>)}
       {grid.rows.map((r, i) => <div key={i} style={{gridRow: i + 2, height: 0}}><div style={{alignContent: "center", transform: "translateY(-50%)"}}><Label text={r!.label}/></div></div>)}

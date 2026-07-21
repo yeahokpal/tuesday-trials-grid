@@ -54,3 +54,11 @@ interface LocalStats {
     gamesWon: number,
     streak: number
 }
+interface EventData
+{
+    id: string,
+    name: string,
+    startTime: number,
+    endTime: number,
+    duration: number
+}
